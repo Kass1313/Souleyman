@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="theme-color" content="#0D1B14"/>
+<title>Souleyman — سُلَيْمَان</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🕌</text></svg>"/>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#0D1B14;--bg2:#12281C;--border:#1A3D2A;--gold:#D4AF37;--gold-dim:#8B7A2E;--text:#E8E4DC;--text2:#9CA89E;--user-bg:#1A3A28;--green:#0A2E1A;--font:'Amiri',Georgia,serif;--mono:'Courier New',monospace;--radius:12px}
+[data-theme="light"]{--bg:#F5F0E8;--bg2:#FFFFFF;--border:#D4C9B0;--text:#1C2A3A;--text2:#6B7B6E;--user-bg:#E8F0E8;--green:#E8F0E8}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--bg);color:var(--text)}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+#app{display:flex;flex-direction:column;height:100vh;height:100dvh}
+.nav{display:flex;border-top:1px solid var(--border);background:var(--bg);padding:4px 0 env(safe-area-inset-bottom,6px);z-index:20;position:relative}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;padding:5px 0;background:none;border:none;color:var(--text2);font-size:9px;font-family:var(--font);cursor:pointer;transition:.2s}
+.nav-btn.active{color:var(--gold)}.nav-btn svg{width:20px;height:20px}
+.page{flex:1;overflow-y:auto;display:none;flex-direction:column}.page.active{display:flex}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:10}
+.hdr-title{font-size:17px;font-weight:700;color:var(--gold)}.hdr-sub{font-size:9px;color:var(--text2);letter-spacing:1.5px;text-transform:uppercase;font-family:var(--mono)}
+.hdr-btn{background:none;border:1px solid var(--border);border-radius:8px;color:var(--text2);padding:5px 10px;font-size:11px;cursor:pointer;font-family:var(--font);transition:.2s}
+.hdr-btn:hover{border-color:var(--gold-dim);color:var(--gold)}
+.hdr-back{background:none;border:none;color:var(--gold);font-size:14px;cursor:pointer;padding:4px 8px;font-family:var(--font)}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin:8px 16px;animation:fadeIn .3s ease}
+.card-title{font-size:11px;color:var(--gold-dim);margin-bottom:8px;letter-spacing:1px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 16px}
+.grid-btn{padding:14px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:12px;cursor:pointer;text-align:center;font-family:var(--font);transition:.2s;line-height:1.3}
+.grid-btn:hover{border-color:var(--gold-dim);background:var(--user-bg)}
+.grid-btn .icon{font-size:20px;display:block;margin-bottom:4px}
+.section-title{font-size:12px;font-weight:700;color:var(--gold);margin:14px 16px 4px;letter-spacing:1px}
+/* Chat */
+.chat-cats{display:flex;gap:6px;padding:8px 16px;overflow-x:auto;border-bottom:1px solid var(--border)}.chat-cats::-webkit-scrollbar{display:none}
+.cat-btn{padding:5px 11px;border-radius:20px;border:1px solid var(--border);background:none;color:var(--text2);font-size:11px;white-space:nowrap;cursor:pointer;font-family:var(--font);transition:.2s;flex-shrink:0}
+.cat-btn.active{background:var(--gold);color:var(--bg);border-color:var(--gold)}
+.msgs{flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:12px}
+.msg-row{display:flex;align-items:flex-end;gap:8px;animation:fadeIn .3s}.msg-row.user{justify-content:flex-end}.msg-row.ai{justify-content:flex-start}
+.sm-av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--green),#1A3D2A);border:1.5px solid var(--gold-dim);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.bubble{max-width:82%;padding:10px 14px;font-size:14px;line-height:1.7;word-break:break-word}
+.bubble.user{background:var(--user-bg);border-radius:16px 16px 4px 16px}.bubble.ai{background:transparent;border:1px solid var(--border);border-radius:16px 16px 16px 4px}
+.bubble h2,.bubble h3,.bubble h4{color:var(--gold);margin:6px 0 3px}.bubble strong{color:var(--gold)}
+.msg-actions{display:flex;gap:4px;margin-top:6px}
+.msg-act{background:none;border:1px solid var(--border);border-radius:6px;color:var(--text2);padding:3px 7px;font-size:10px;cursor:pointer;font-family:var(--mono);transition:.2s}
+.msg-act:hover{border-color:var(--gold-dim);color:var(--gold)}.msg-act.faved{color:var(--gold);border-color:var(--gold)}
+.loading-b{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:16px 16px 16px 4px;border:1px solid var(--border);font-size:12px;color:var(--text2)}
+.input-area{padding:8px 16px 16px;border-top:1px solid var(--border);background:var(--bg)}
+.input-row{display:flex;gap:8px;align-items:flex-end;max-width:680px;margin:0 auto}
+.input-row textarea{flex:1;padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;color:var(--text);font-size:14px;font-family:var(--font);resize:none;outline:none;line-height:1.4;min-height:42px;max-height:100px}
+.input-row textarea:focus{border-color:var(--gold-dim)}.input-row textarea::placeholder{color:var(--text2)}
+.send-btn{width:42px;height:42px;border-radius:50%;background:var(--gold);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--bg);flex-shrink:0}
+.send-btn:disabled{background:var(--border);color:var(--text2);cursor:default}.send-btn svg{width:18px;height:18px}
+/* Adhkar */
+.adhkar-tabs{display:flex;border-bottom:1px solid var(--border)}
+.adhkar-tab{flex:1;padding:10px;text-align:center;font-size:13px;cursor:pointer;border:none;background:none;color:var(--text2);font-family:var(--font);font-weight:700;transition:.2s}
+.adhkar-tab.active{color:var(--gold);border-bottom:2px solid var(--gold)}
+.dhikr-item{padding:12px 16px;border-bottom:1px solid var(--border)}
+.dhikr-ar{font-size:17px;color:var(--gold);text-align:right;line-height:2;margin-bottom:4px}
+.dhikr-fr{font-size:12px;color:var(--text);line-height:1.5;margin-bottom:4px}
+.dhikr-count{display:flex;align-items:center;gap:8px;margin-top:6px}
+.dhikr-counter{display:flex;align-items:center;gap:6px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:3px 8px}
+.dhikr-num{font-size:15px;font-weight:700;color:var(--gold);min-width:20px;text-align:center}
+.dhikr-cbtn{width:26px;height:26px;border-radius:50%;border:1px solid var(--border);background:none;color:var(--text);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.dhikr-reps{font-size:10px;color:var(--text2)}
+/* List items */
+.list-item{padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:.2s;animation:fadeIn .3s}
+.list-item:hover{background:var(--bg2)}
+.list-item-title{font-size:14px;color:var(--text);font-weight:700}
+.list-item-sub{font-size:12px;color:var(--text2);margin-top:2px}
+.list-item-ar{font-size:18px;color:var(--gold);text-align:right;line-height:1.8}
+/* Detail page */
+.detail{padding:16px;line-height:1.8;font-size:14px}
+.detail-ar{font-size:22px;color:var(--gold);text-align:right;line-height:2;margin:12px 0}
+.detail-section{margin:16px 0;padding:12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius)}
+.detail-label{font-size:11px;color:var(--gold-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+/* Quiz */
+.quiz-card{padding:20px 16px;animation:fadeIn .3s}
+.quiz-q{font-size:16px;color:var(--gold);margin-bottom:16px;line-height:1.6}
+.quiz-opt{display:block;width:100%;padding:12px 16px;margin:6px 0;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;cursor:pointer;font-family:var(--font);text-align:left;transition:.2s}
+.quiz-opt:hover{border-color:var(--gold-dim)}
+.quiz-opt.correct{background:#1a3a28;border-color:#2ecc71;color:#2ecc71}
+.quiz-opt.wrong{background:#3a1a1a;border-color:#e74c3c;color:#e74c3c}
+.quiz-opt.reveal{background:#1a3a28;border-color:#2ecc71;color:#2ecc71}
+.quiz-expl{padding:12px;margin-top:12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;font-size:13px;line-height:1.6}
+.quiz-score{text-align:center;padding:20px;font-size:18px;color:var(--gold)}
+.quiz-progress{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2)}
+.quiz-bar{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.quiz-fill{height:100%;background:var(--gold);border-radius:2px;transition:.3s}
+/* Study tracker */
+.study-item{display:flex;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border);gap:12px}
+.study-check{width:24px;height:24px;border-radius:6px;border:2px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:.2s;flex-shrink:0}
+.study-check.done{background:var(--gold);border-color:var(--gold);color:var(--bg)}
+.study-info{flex:1}
+.study-name{font-size:14px;color:var(--text)}
+.study-desc{font-size:11px;color:var(--text2);margin-top:2px}
+/* Settings */
+.sett-group{padding:14px 16px;border-bottom:1px solid var(--border)}
+.sett-label{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;font-family:var(--mono);margin-bottom:8px}
+.sett-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0}
+.sett-name{font-size:13px;color:var(--text)}.sett-val{font-size:13px;color:var(--gold)}
+.sett-input{padding:7px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;font-family:var(--font);outline:none;width:160px}
+.sett-select{padding:7px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;font-family:var(--font)}
+.toggle{width:42px;height:22px;border-radius:11px;border:1px solid var(--border);background:var(--bg2);cursor:pointer;position:relative;transition:.2s}
+.toggle.on{background:var(--gold);border-color:var(--gold)}.toggle::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--text);transition:.2s}
+.toggle.on::after{left:22px;background:var(--bg)}
+.sett-btn{padding:8px 16px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text);font-size:12px;cursor:pointer;font-family:var(--font);transition:.2s;margin:4px 0}
+.sett-btn:hover{border-color:var(--gold-dim);color:var(--gold)}.sett-btn.danger{border-color:#c0392b;color:#e74c3c}
+.kb-item{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)}
+.kb-text{font-size:12px;color:var(--text);flex:1;margin-right:8px}
+.kb-del{background:none;border:none;color:#e74c3c;cursor:pointer;font-size:14px}
+/* Setup & Modal */
+.setup{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;padding:30px;text-align:center;gap:16px;animation:fadeIn .6s}
+.setup-av{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--green),#1A3D2A);border:2px solid var(--gold-dim);display:flex;align-items:center;justify-content:center;font-size:36px;box-shadow:0 0 30px rgba(212,175,55,.2)}
+.setup-t{font-size:28px;color:var(--gold)}.setup-d{font-size:14px;color:var(--text2);max-width:340px;line-height:1.7}.setup-d strong{color:var(--gold)}
+.setup-steps{text-align:left;max-width:340px;font-size:13px;color:var(--text2);line-height:1.8;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px}.setup-steps strong{color:var(--text)}
+.setup-inp{width:100%;max-width:340px;padding:12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:var(--mono);outline:none}
+.setup-btn{padding:14px 40px;background:var(--gold);border:none;border-radius:var(--radius);color:var(--bg);font-size:16px;font-family:var(--font);font-weight:700;cursor:pointer}
+.setup-link{color:var(--gold-dim);font-size:12px;text-decoration:underline}
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:50;display:flex;align-items:center;justify-content:center}
+.modal{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:20px;max-width:340px;width:90%;max-height:80vh;overflow-y:auto}
+.modal-title{font-size:15px;font-weight:700;color:var(--gold);margin-bottom:10px}
+.modal textarea{width:100%;min-height:80px;padding:10px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;font-family:var(--font);resize:vertical;outline:none}
+.modal-btns{display:flex;gap:8px;margin-top:10px;justify-content:flex-end}
+.modal-btn{padding:7px 14px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text);font-size:12px;cursor:pointer;font-family:var(--font)}
+.modal-btn.primary{background:var(--gold);color:var(--bg);border-color:var(--gold)}
+.hist-search{margin:10px 16px;padding:9px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:13px;font-family:var(--font);outline:none;width:calc(100% - 32px)}
+@media(max-width:480px){.bubble{max-width:88%}.grid2{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const PROPHETS=[
+{name:"Adam (آدَم)",icon:"🌿",summary:"Premier homme et premier prophète. Allah le créa à partir d'argile et insuffla en lui de Son esprit. Il lui enseigna les noms de toutes choses. Allah ordonna aux anges de se prosterner devant lui ; tous obéirent sauf Iblîs qui refusa par orgueil : « Je suis meilleur que lui, Tu m'as créé de feu et lui d'argile » [Al-A'raf 7:12].\n\nAdam et Hawwa furent installés au Paradis avec l'interdiction de s'approcher d'un arbre. Iblîs les tenta et ils en mangèrent. Ils implorèrent : « Rabbana zalamna anfusana... » [Al-A'raf 7:23]. Allah accepta leur repentir et les descendit sur terre comme khalifes.\n\nSes fils Hâbil et Qâbil offrirent chacun un sacrifice. Celui de Hâbil fut accepté. Qâbil, jaloux, tua son frère — premier meurtre de l'humanité [Al-Ma'idah 5:27-31].",verses:"[Al-Baqarah 2:30-37, Al-A'raf 7:11-25, Ta-Ha 20:115-123]",lecon:"Le repentir sincère est toujours accepté. L'orgueil causa la chute d'Iblîs. Adam est le père de l'humanité et le premier à qui Allah enseigna le Tawhîd."},
+{name:"Idris (إِدْرِيس)",icon:"📚",summary:"Descendant d'Adam, prophète et homme de vérité (siddîq). Allah dit : « Mentionne Idris dans le Livre. C'était un véridique et un prophète. Et Nous l'élevâmes à un haut rang » [Maryam 19:56-57].\n\nSelon Ibn Kathir, Idris fut le premier à écrire avec le calame (la plume), le premier à coudre des vêtements et à étudier les étoiles et le calcul. Il était connu pour sa grande patience dans l'adoration d'Allah et son appel au Tawhîd.\n\nLe Prophète Muhammad ﷺ le rencontra au quatrième ciel lors du voyage nocturne (al-Isra' wal-Mi'raj) [Bukhari & Muslim].",verses:"[Maryam 19:56-57, Al-Anbiya 21:85]",lecon:"L'importance de la science et de l'écriture au service de la religion. La patience dans l'adoration."},
+{name:"Nuh (نُوح)",icon:"🚢",summary:"L'un des cinq prophètes doués de fermeté (Ulul-'Azm). Son peuple adorait cinq idoles : Wadd, Suwâ', Yaghûth, Ya'ûq et Nasr — à l'origine des noms d'hommes pieux que le peuple finit par adorer après leur mort. C'est ainsi que le Shirk entra dans l'humanité.\n\nNuh appela son peuple au Tawhîd pendant 950 ans [Al-Ankabut 29:14], de jour et de nuit, en secret et en public. Seul un petit groupe crut. Allah lui ordonna de construire l'Arche. Quand le déluge arriva, son propre fils refusa de monter : « Je me réfugierai sur une montagne. » Les vagues les séparèrent [Hud 11:42-43]. Allah dit à Nuh : « Il n'est pas de ta famille, car il a commis un acte infâme » [Hud 11:46].\n\nLe lien de sang ne sauve pas sans la foi.",verses:"[Hud 11:25-49, Nuh 71:1-28, Al-Mu'minun 23:23-30]",lecon:"La patience dans la da'wa. Le Shirk est entré par l'exagération envers les pieux. Le lien de sang ne sauve pas sans le Tawhîd."},
+{name:"Hud (هُود)",icon:"🏜️",summary:"Envoyé au peuple de 'Âd, une tribu arabe puissante qui vivait dans le sud de la péninsule arabique (Al-Ahqâf). Ils construisaient des édifices imposants sur chaque hauteur et se croyaient invincibles : « Qui est plus fort que nous ? » [Fussilat 41:15].\n\nHud les appela au Tawhîd et à abandonner leurs idoles. Ils le rejetèrent et le traitèrent de menteur. Allah les châtia par un vent violent et glacial qui souffla pendant sept nuits et huit jours consécutifs, détruisant tout sur son passage : « Tu aurais vu les gens renversés comme des troncs de palmiers creux » [Al-Haqqah 69:7].\n\nHud et les croyants furent épargnés.",verses:"[Al-A'raf 7:65-72, Hud 11:50-60, Ash-Shu'ara 26:123-140, Al-Haqqah 69:6-8]",lecon:"La force physique et matérielle ne protège pas du châtiment d'Allah. L'arrogance mène à la destruction."},
+{name:"Salih (صَالِح)",icon:"🐫",summary:"Envoyé au peuple de Thamûd, successeurs de 'Âd, qui vivaient dans la région d'Al-Hijr (nord de l'Arabie). Ils taillaient des maisons dans la roche des montagnes et étaient prospères.\n\nSalih les appela au Tawhîd. Ils exigèrent un miracle : qu'il fasse sortir une chamelle d'un rocher. Allah fit apparaître une chamelle miraculeuse. Salih les avertit : « Voici la chamelle d'Allah, comme signe pour vous. Laissez-la manger sur la terre d'Allah et ne lui faites pas de mal » [Al-A'raf 7:73].\n\nNeuf hommes corrompus complotèrent et égorgèrent la chamelle. Salih les avertit : « Jouissez encore de trois jours dans vos demeures » [Hud 11:65]. Au terme des trois jours, le Sayha (cri terrible) les anéantit tous.\n\nLe Prophète ﷺ passa par les ruines de Thamûd lors de l'expédition de Tabûk et interdit aux Compagnons de boire leur eau [Bukhari].",verses:"[Al-A'raf 7:73-79, Hud 11:61-68, Ash-Shu'ara 26:141-159, Ash-Shams 91:11-15]",lecon:"Défier les signes d'Allah mène à la destruction. Les complots contre la vérité échouent toujours."},
+{name:"Ibrahim (إِبْرَاهِيم)",icon:"🕋",summary:"L'ami intime d'Allah (Khalîlullâh), l'un des cinq Ulul-'Azm. Dès son jeune âge, il rejeta les idoles et les astres : « Je n'aime pas les choses qui disparaissent » [Al-An'am 6:76-79].\n\nIl confronta son père Âzar qui sculptait des idoles. Il brisa toutes les idoles du temple sauf la plus grande, puis dit : « C'est la grande qui l'a fait, interrogez-les ! » [Al-Anbiya 21:63]. Son peuple le jeta dans un bûcher, mais Allah ordonna : « Ô feu, sois fraîcheur et paix pour Ibrahim ! » [Al-Anbiya 21:69].\n\nIl laissa Hajar et Ismaïl dans le désert de La Mecque par ordre d'Allah. Zamzam jaillit sous les pieds d'Ismaïl. Allah l'éprouva par le sacrifice de son fils — tous deux se soumirent. Allah remplaça Ismaïl par un bélier [As-Saffat 37:102-107].\n\nIbrahim et Ismaïl élevèrent les fondations de la Ka'ba [Al-Baqarah 2:127].",verses:"[Al-Baqarah 2:124-131, Al-An'am 6:74-83, Al-Anbiya 21:51-70, As-Saffat 37:83-113]",lecon:"Le Tawhîd pur est le cœur du message. La soumission totale à Allah même dans les épreuves les plus dures."},
+{name:"Lut (لُوط)",icon:"⚡",summary:"Neveu d'Ibrahim, il émigra avec lui puis fut envoyé aux habitants de Sodome, un peuple qui commettait la turpitude (homosexualité) : « Vous commettez la turpitude qu'aucun peuple avant vous n'avait commise » [Al-A'raf 7:80].\n\nLut les appela à cesser cette abomination et à revenir au Tawhîd. Ils le menacèrent d'expulsion. Quand des anges sous forme humaine vinrent le visiter, son peuple accourut avec de mauvaises intentions. Lut dit : « C'est un jour difficile » [Hud 11:77]. Les anges les frappèrent de cécité.\n\nAllah ordonna à Lut de partir avec sa famille de nuit, sauf sa femme qui était parmi les mécréants. Au matin, Allah renversa la cité : le haut devint le bas, et fit pleuvoir sur eux des pierres d'argile [Hud 11:82-83].",verses:"[Al-A'raf 7:80-84, Hud 11:77-83, Ash-Shu'ara 26:160-175, Al-Ankabut 29:28-35]",lecon:"La perversion sexuelle est un péché gravissime qui attire le châtiment d'Allah. La vérité doit être dite même quand elle déplaît."},
+{name:"Isma'il (إِسْمَاعِيل)",icon:"🐑",summary:"Fils aîné d'Ibrahim, né de Hajar. Laissé bébé avec sa mère dans la vallée aride de La Mecque. Hajar courut sept fois entre Safa et Marwa — un acte reproduit au Hajj. Zamzam jaillit sous les pieds d'Ismaïl.\n\nAdolescent, il accepta le sacrifice ordonné par Allah : « Ô mon père, fais ce qui t'est commandé. Tu me trouveras patient » [As-Saffat 37:102]. Allah envoya un bélier en remplacement.\n\nIl aida Ibrahim à construire la Ka'ba. Il s'installa parmi Jurhum et devint l'ancêtre des Arabes du nord, la lignée du Prophète ﷺ. Décrit comme « fidèle à ses promesses » (Sâdiq al-Wa'd) [Maryam 19:54].",verses:"[As-Saffat 37:100-111, Maryam 19:54-55, Al-Baqarah 2:125-129]",lecon:"L'obéissance totale à Allah et au père. La patience dans l'épreuve."},
+{name:"Ishaq (إِسْحَاق)",icon:"🌟",summary:"Second fils d'Ibrahim, né miraculeusement de Sârah alors qu'elle était très âgée et stérile. Les anges annoncèrent sa naissance à Ibrahim et Sârah : « Nous t'annonçons la bonne nouvelle d'un garçon savant » [Adh-Dhariyat 51:28]. Sârah s'étonna : « Vais-je enfanter alors que je suis vieille ? » [Hud 11:72].\n\nIshaq fut un prophète pieux, père de Ya'qub (Israël). Par lui passa la lignée des prophètes d'Israël. Allah dit : « Et Nous lui fîmes la bonne annonce d'Ishaq comme prophète parmi les vertueux » [As-Saffat 37:112].",verses:"[Hud 11:71-73, As-Saffat 37:112-113, Al-Anbiya 21:72]",lecon:"Allah donne ce qu'Il veut à qui Il veut, même quand les causes matérielles semblent impossibles."},
+{name:"Ya'qub (يَعْقُوب)",icon:"💎",summary:"Fils d'Ishaq, aussi appelé Israël (عبد الله — serviteur d'Allah selon Ibn Taymiyya). Père des douze tribus d'Israël. Son histoire est intimement liée à celle de son fils Yusuf.\n\nQuand ses fils lui ramenèrent la chemise de Yusuf tachée de faux sang, il dit avec patience : « Mon âme m'a plutôt suggéré quelque chose. Patience ! C'est Allah dont le secours est imploré » [Yusuf 12:18]. Il pleura Yusuf au point de perdre la vue.\n\nMais il ne désespéra jamais d'Allah : « Ne désespérez pas de la miséricorde d'Allah » [Yusuf 12:87]. Allah le récompensa en lui rendant Yusuf et sa vue.\n\nSur son lit de mort, il demanda à ses fils : « Qu'adorerez-vous après moi ? » Ils répondirent : « Nous adorerons ton Dieu, le Dieu d'Ibrahim, d'Ismaïl et d'Ishaq, un Dieu unique » [Al-Baqarah 2:133].",verses:"[Yusuf 12:18, 12:84-87, Al-Baqarah 2:132-133]",lecon:"La patience face aux épreuves les plus dures. Ne jamais désespérer de la miséricorde d'Allah. Transmettre le Tawhîd à ses enfants."},
+{name:"Yusuf (يُوسُف)",icon:"⭐",summary:"Fils de Ya'qub, son histoire est « le plus beau des récits » (Ahsan al-Qasas). Enfant, il vit en rêve onze étoiles, le soleil et la lune se prosterner devant lui.\n\nSes frères le jetèrent dans un puits par jalousie. Des voyageurs le vendirent comme esclave en Égypte. La femme du ministre (Zulaykha) tenta de le séduire. Il refusa : « Qu'Allah me protège ! » [Yusuf 12:23]. Elle l'accusa faussement et il fut emprisonné.\n\nEn prison, il interpréta des rêves. Quand le roi eut un rêve (sept vaches grasses dévorées par sept maigres), Yusuf l'expliqua : sept années d'abondance puis sept de famine. Le roi le nomma ministre.\n\nSes frères vinrent pour des provisions. Yusuf se révéla et les pardonna : « Pas de reproche sur vous aujourd'hui » [Yusuf 12:92]. Toute la famille fut réunie — le rêve d'enfance se réalisa.",verses:"[Yusuf 12:1-111 — sourate entière]",lecon:"La patience face à l'injustice. La chasteté. Le pardon est une force. Allah planifie toujours le meilleur."},
+{name:"Shu'ayb (شُعَيْب)",icon:"⚖️",summary:"Envoyé au peuple de Madyan, des commerçants qui trichaient dans les mesures et les poids. Shu'ayb leur dit : « Ô mon peuple, donnez la juste mesure et le juste poids, ne sous-estimez pas les biens des gens » [Hud 11:85].\n\nIl les appela aussi au Tawhîd et à abandonner les idoles. Appelé « l'orateur des prophètes » (Khatîb al-Anbiyâ') pour son éloquence. Son peuple le rejeta et le menaça.\n\nAllah les châtia par le jour de l'Ombre (yawm az-zulla) : un nuage ardent les recouvrit et le Sayha (cri) les anéantit [Ash-Shu'ara 26:189].\n\nLe Prophète Musa épousa la fille de Shu'ayb (ou d'un homme pieux de Madyan selon d'autres avis) et travailla pour lui pendant 8 à 10 ans [Al-Qasas 28:27].",verses:"[Al-A'raf 7:85-93, Hud 11:84-95, Ash-Shu'ara 26:176-191]",lecon:"L'honnêteté dans le commerce est un pilier de l'Islam. Tricher dans les mesures est un péché grave."},
+{name:"Ayyub (أَيُّوب)",icon:"🤲",summary:"Prophète célèbre pour sa patience légendaire. Allah l'éprouva en lui retirant sa santé, ses biens et ses enfants. Il souffrit d'une longue maladie qui dura selon les récits 7 à 18 ans. Les gens le délaissèrent sauf sa femme fidèle.\n\nMalgré tout, il ne se plaignit jamais à autre qu'Allah. Quand l'épreuve atteignit son comble, il invoqua : « Le mal m'a touché, et Toi Tu es le plus Miséricordieux des miséricordieux » [Al-Anbiya 21:83].\n\nAllah lui répondit immédiatement : « Frappe du pied ! Voici une eau fraîche pour te laver et boire » [Sad 38:42]. Allah le guérit, lui rendit ses biens au double, et lui redonna des enfants.\n\nIbn Kathir rapporte que sa patience est devenue proverbiale (Sabr Ayyub).",verses:"[Al-Anbiya 21:83-84, Sad 38:41-44]",lecon:"La patience dans l'épreuve est récompensée au-delà de ce qu'on imagine. Ne se plaindre qu'à Allah seul."},
+{name:"Dhul-Kifl (ذُو الْكِفْل)",icon:"📜",summary:"Mentionné dans le Coran parmi les patients et les vertueux. Allah dit : « Et Ismaïl et Idris et Dhul-Kifl : tous faisaient partie des patients. Et Nous les fîmes entrer dans Notre miséricorde. Ils étaient du nombre des vertueux » [Al-Anbiya 21:85-86].\n\nIbn Kathir mentionne qu'il se chargea de garantir (takaffala) l'adoration d'Allah en priant la nuit, jeûnant le jour et jugeant entre les gens avec justice. Son nom signifie « celui qui garantit » ou « celui qui a la charge ».\n\nCertains savants le considèrent comme un prophète, d'autres comme un homme pieux. La majorité des savants salafistes le comptent parmi les prophètes car il est mentionné avec eux dans le Coran.",verses:"[Al-Anbiya 21:85-86, Sad 38:48]",lecon:"La constance dans l'adoration et la justice. Tenir ses engagements envers Allah."},
+{name:"Musa (مُوسَى)",icon:"🌊",summary:"Le prophète le plus mentionné dans le Coran, l'un des cinq Ulul-'Azm. Né quand Pharaon massacrait les garçons israélites. Sa mère le plaça dans un coffre sur le Nil. Recueilli par la famille de Pharaon — Allah réalisant Sa promesse.\n\nIl tua accidentellement un Égyptien puis s'enfuit à Madyan. Après 10 ans, Allah lui parla au mont Tur : « Je suis Allah, le Seigneur des mondes » [Al-Qasas 28:30]. Il reçut le bâton et la main lumineuse comme signes.\n\nEnvoyé avec Hârun à Pharaon qui refusa malgré 9 signes miraculeux. Les magiciens se convertirent en voyant le miracle. Musa guida les Bani Israïl hors d'Égypte. Il fendit la mer — Pharaon et son armée furent noyés.\n\nSur le mont Tur, Allah lui donna la Torah. Pendant son absence, le peuple adora le veau d'or. Musa brisa les Tables de colère.",verses:"[Al-Baqarah 2:49-74, Al-A'raf 7:103-171, Ta-Ha 20:9-98, Al-Qasas 28:1-46]",lecon:"Le courage face à la tyrannie. La patience face à un peuple difficile. Les miracles ne suffisent pas aux cœurs orgueilleux."},
+{name:"Harun (هَارُون)",icon:"🕊️",summary:"Frère aîné de Musa, prophète et vizir. Allah le désigna pour accompagner Musa dans sa mission auprès de Pharaon, sur demande de Musa : « Et donne-moi un assistant de ma famille, Hârun mon frère. Accrois par lui ma force et associe-le à ma mission » [Ta-Ha 20:29-32].\n\nHârun était éloquent et doux. Quand Musa s'absenta 40 jours au mont Tur, le peuple adora le veau d'or malgré les avertissements de Hârun. Quand Musa revint en colère et le saisit par la barbe, Hârun dit : « Ô fils de ma mère, ne me prends ni par la barbe ni par la tête. J'ai craint que tu ne dises : tu as divisé les enfants d'Israël » [Ta-Ha 20:94].\n\nLe Prophète ﷺ dit à Ali : « Tu es pour moi ce que Hârun était pour Musa, sauf qu'il n'y a pas de prophète après moi » [Bukhari & Muslim].",verses:"[Ta-Ha 20:29-36, 20:90-94, Al-A'raf 7:142, Maryam 19:53]",lecon:"L'importance du travail en équipe dans la da'wa. La douceur face à la colère. Préserver l'unité de la communauté."},
+{name:"Dawud (دَاوُد)",icon:"📖",summary:"Roi-prophète. Jeune berger, il vainquit le géant Jalut (Goliath) avec une fronde par la permission d'Allah [Al-Baqarah 2:251]. Allah lui donna le royaume, la sagesse et les Psaumes (Az-Zabur).\n\nLe fer devenait malléable dans ses mains [Saba 34:10-11]. Les montagnes et les oiseaux glorifiaient Allah avec lui [Sad 38:18-19]. Sa voix était d'une beauté incomparable.\n\nIl jeûnait un jour sur deux — le meilleur jeûne selon le Prophète ﷺ [Bukhari]. Il priait la nuit et jugeait avec justice.",verses:"[Al-Baqarah 2:251, Saba 34:10-11, Sad 38:17-26]",lecon:"La confiance en Allah donne la victoire contre l'impossible. Le dhikr constant. Le meilleur jeûne est celui de Dawud."},
+{name:"Sulayman (سُلَيْمَان)",icon:"👑",summary:"Fils de Dawud. Allah lui soumit le vent, les jinns et les oiseaux. Il comprenait le langage des animaux. Une fourmi dit : « Entrez dans vos demeures, de peur que Sulayman ne vous écrase » [An-Naml 27:18]. Il sourit et remercia Allah.\n\nLa huppe lui rapporta le royaume de Saba (reine Bilqîs) qui adorait le soleil. Sulayman fit transporter son trône en un instant. La reine se convertit.\n\nÀ sa mort, les jinns ne s'en rendirent compte que lorsqu'un ver rongea son bâton [Saba 34:14] — preuve que les jinns ne connaissent pas l'invisible.",verses:"[An-Naml 27:15-44, Saba 34:12-14, Sad 38:30-40]",lecon:"La gratitude pour les bienfaits. Utiliser le pouvoir pour le Tawhîd. Les jinns ne connaissent pas l'invisible."},
+{name:"Ilyas (إِلْيَاس)",icon:"🌲",summary:"Prophète envoyé aux Bani Israïl qui adoraient l'idole Ba'l (Baal). Il les appela au Tawhîd : « Ne craignez-vous pas Allah ? Invoquerez-vous Ba'l et délaisserez-vous le Meilleur des créateurs, Allah votre Seigneur et le Seigneur de vos premiers ancêtres ? » [As-Saffat 37:124-126].\n\nSon peuple le traita de menteur. Allah dit : « Ils le traitèrent de menteur. Ils seront certes amenés au châtiment, sauf les serviteurs élus d'Allah » [As-Saffat 37:127-128].\n\nIlyas est identifié par certains savants à Élie. Ibn Kathir le place parmi les prophètes des Bani Israïl après Sulayman.",verses:"[As-Saffat 37:123-132, Al-An'am 6:85]",lecon:"Combattre l'idolâtrie sous toutes ses formes. Le courage de dire la vérité face à un peuple égaré."},
+{name:"Al-Yasa' (الْيَسَع)",icon:"🌿",summary:"Prophète des Bani Israïl, successeur d'Ilyas. Allah le mentionne parmi les meilleurs : « Et Ismaïl et Al-Yasa' et Yunus et Lut. À chacun Nous avons donné la préférence sur les mondes » [Al-An'am 6:86].\n\nIl est aussi mentionné dans la sourate Sad : « Et rappelle-toi Ismaïl et Al-Yasa' et Dhul-Kifl. Tous sont parmi les meilleurs » [Sad 38:48].\n\nIbn Kathir rapporte qu'il continua la mission d'Ilyas auprès des Bani Israïl, les appelant au Tawhîd et à suivre la Torah.",verses:"[Al-An'am 6:86, Sad 38:48]",lecon:"La continuité du message du Tawhîd à travers les générations de prophètes."},
+{name:"Yunus (يُونُس)",icon:"🐋",summary:"Aussi appelé Dhun-Nûn. Envoyé à Ninive (~100 000 habitants). Ils refusèrent son message. Frustré, il quitta son peuple sans permission d'Allah.\n\nSur un navire en tempête, le sort tomba sur lui trois fois. Jeté à la mer, il fut avalé par un poisson. Dans les ténèbres, il invoqua : « Lâ ilâha illâ Anta, Subhânaka, innî kuntu min az-zâlimîn » [Al-Anbiya 21:87].\n\nAllah le sauva. Son peuple, après son départ, se repentit sincèrement — le seul peuple à s'être repenti collectivement dans le Coran [Yunus 10:98].\n\nLe Prophète ﷺ dit : « Aucun musulman n'invoque avec la du'a de Yunus sans qu'Allah ne l'exauce » [At-Tirmidhi].",verses:"[Al-Anbiya 21:87-88, As-Saffat 37:139-148, Yunus 10:98]",lecon:"Ne jamais abandonner sa mission. Le pouvoir immense de l'invocation. Le repentir sincère est accepté."},
+{name:"Zakariya (زَكَرِيَّا)",icon:"🤲",summary:"Prophète des Bani Israïl, tuteur de Maryam (mère de 'Isa). Chaque fois qu'il entrait dans le mihrab de Maryam, il trouvait de la nourriture auprès d'elle. Il demanda : « D'où te vient cela ? » Elle dit : « Cela vient d'Allah » [Al Imran 3:37].\n\nInspiré par ce miracle, Zakariya, très âgé et dont la femme était stérile, invoqua Allah en secret : « Ô mon Seigneur, ne me laisse pas seul, et Tu es le meilleur des héritiers » [Al-Anbiya 21:89]. « Ô mon Seigneur, mes os sont affaiblis, ma tête s'est enflammée de cheveux blancs, et je n'ai jamais été malheureux dans mes invocations » [Maryam 19:4].\n\nAllah lui annonça la naissance de Yahya — un nom que personne n'avait porté avant [Maryam 19:7]. Comme signe, il ne pourrait pas parler aux gens pendant trois jours.",verses:"[Al Imran 3:37-41, Maryam 19:2-11, Al-Anbiya 21:89-90]",lecon:"Invoquer Allah avec humilité et persistance. L'âge n'empêche pas les miracles d'Allah. Ne jamais désespérer du du'a."},
+{name:"Yahya (يَحْيَى)",icon:"🕊️",summary:"Fils de Zakariya, né miraculeusement d'un père âgé et d'une mère stérile. Allah lui donna un nom unique : « Nous ne lui avons pas donné auparavant d'homonyme » [Maryam 19:7].\n\nAllah dit : « Ô Yahya, prends le Livre avec force ! Et Nous lui donnâmes la sagesse alors qu'il était enfant, ainsi que la tendresse et la pureté. Il était pieux et dévoué envers ses parents, et ne fut ni violent ni désobéissant » [Maryam 19:12-14].\n\nYahya fut le premier à croire en 'Isa et à confirmer sa mission. Le Prophète ﷺ le rencontra au deuxième ciel lors du Mi'raj avec 'Isa [Bukhari & Muslim].\n\nIbn Kathir rapporte qu'il ne commit jamais de péché et qu'il pleurait beaucoup par crainte d'Allah.",verses:"[Maryam 19:7-15, Al Imran 3:39, Al-Anbiya 21:90, Al-An'am 6:85]",lecon:"La sagesse dès le jeune âge. La piété et la douceur. Confirmer la vérité quand elle vient."},
+{name:"'Isa (عِيسَى)",icon:"✨",summary:"Fils de Maryam, créé sans père par « Kun » (Sois). Sa naissance est comparée à Adam : « Pour Allah, 'Isa est comme Adam qu'Il créa de poussière » [Al Imran 3:59].\n\nMaryam, femme pieuse choisie par Allah, conçut par décret divin. 'Isa parla au berceau : « Je suis le serviteur d'Allah » [Maryam 19:30]. Ses miracles par permission d'Allah : guérir les aveugles et les lépreux, ressusciter les morts, donner vie à un oiseau d'argile [Al Imran 3:49].\n\nIl appela au Tawhîd. Allah affirme : « Ils ne l'ont ni tué ni crucifié, mais ce n'était qu'un faux-semblant » [An-Nisa 4:157]. Allah l'a élevé vivant au ciel. Il reviendra avant le Jour du Jugement.\n\n'Isa n'est PAS le fils d'Allah. La Trinité est du Shirk [Al-Ma'idah 5:72-73].",verses:"[Al Imran 3:42-59, Maryam 19:16-36, An-Nisa 4:157-159, Al-Ma'idah 5:72-78]",lecon:"'Isa est prophète, pas dieu. Le Tawhîd est le message de tous les prophètes. La Trinité est du Shirk majeur."},
+{name:"Muhammad ﷺ",icon:"🕌",summary:"Le sceau des prophètes (Khâtam an-Nabiyyîn), envoyé à toute l'humanité. Né à La Mecque en 570, orphelin, connu comme as-Sâdiq al-Amîn. Il reçut la révélation à 40 ans dans la grotte de Hirâ' : « Lis au nom de ton Seigneur » [Al-Alaq 96:1].\n\n13 ans de da'wa à La Mecque sous la persécution. Émigration à Médine (Hijra, 622). Il établit l'État islamique, la fraternité, la mosquée. Batailles : Badr (victoire à 313 contre ~1000), Uhud, Khandaq. Conquête de La Mecque sans effusion de sang — pardon aux ennemis.\n\nLe Mi'raj : voyage aux cieux, prescription des 5 prières. Son sermon d'adieu : « J'ai laissé parmi vous le Livre d'Allah et ma Sunnah » [Muslim].\n\nIl mourut le 12 Rabi' al-Awwal 11 H à Médine, à 63 ans.",verses:"[Al-Ahzab 33:21, 33:40, Al-Anbiya 21:107, Al-Alaq 96:1-5]",lecon:"L'exemple parfait. Miséricorde pour les mondes. Attachement au Coran et à la Sunnah."}
+];
+
+const PROPHET_TREE=[
+{gen:0,text:"Adam (آدَم) — Premier homme"},
+{gen:1,text:"... plusieurs générations ..."},
+{gen:1,text:"Idris (إِدْرِيس)"},
+{gen:1,text:"... plusieurs générations ..."},
+{gen:1,text:"Nuh (نُوح) — Sauvé du déluge"},
+{gen:2,text:"Sâm (fils de Nuh) — ancêtre des Sémites"},
+{gen:3,text:"... générations ..."},
+{gen:3,text:"Hud (هُود) — envoyé à 'Âd"},
+{gen:3,text:"Salih (صَالِح) — envoyé à Thamûd"},
+{gen:3,text:"Ibrahim (إِبْرَاهِيم) — l'ami d'Allah"},
+{gen:4,text:"Isma'il (إِسْمَاعِيل) — fils de Hajar → lignée arabe → Muhammad ﷺ"},
+{gen:4,text:"Ishaq (إِسْحَاق) — fils de Sârah → lignée israélite"},
+{gen:5,text:"Ya'qub (يَعْقُوب) = Israël"},
+{gen:6,text:"Yusuf (يُوسُف) — fils de Ya'qub"},
+{gen:4,text:"Lut (لُوط) — neveu d'Ibrahim"},
+{gen:3,text:"Shu'ayb (شُعَيْب) — envoyé à Madyan"},
+{gen:5,text:"Ayyub (أَيُّوب) — descendant d'Ishaq"},
+{gen:5,text:"Dhul-Kifl (ذُو الْكِفْل)"},
+{gen:6,text:"Musa (مُوسَى) et Harun (هَارُون) — Bani Israïl"},
+{gen:6,text:"Dawud (دَاوُد) → Sulayman (سُلَيْمَان) — rois-prophètes"},
+{gen:6,text:"Ilyas (إِلْيَاس) → Al-Yasa' (الْيَسَع)"},
+{gen:6,text:"Yunus (يُونُس) — envoyé à Ninive"},
+{gen:6,text:"Zakariya (زَكَرِيَّا) → Yahya (يَحْيَى)"},
+{gen:6,text:"'Isa (عِيسَى) — fils de Maryam, sans père"},
+{gen:4,text:"Muhammad ﷺ — descendant d'Isma'il, sceau des prophètes"}
+];
+
+const COMPANIONS=[
+{name:"Abu Bakr as-Siddîq",ar:"أبو بكر الصديق",bio:"Premier homme à embrasser l'Islam après le Prophète ﷺ. Premier calife. Compagnon dans la grotte lors de la Hijra [At-Tawbah 9:40]. Il dépensa toute sa fortune pour l'Islam, libéra Bilâl de l'esclavage. Il combattit les apostats après la mort du Prophète ﷺ (Guerres de Ridda) et unifia l'Arabie. Le Prophète ﷺ dit : 'Si je devais prendre un ami intime (khalîl), ce serait Abu Bakr' [Bukhari]."},
+{name:"'Umar ibn al-Khattâb",ar:"عمر بن الخطاب",bio:"Deuxième calife, surnommé Al-Fârûq (celui qui distingue le vrai du faux). Sa conversion renforça l'Islam. Sous son califat : conquête de la Perse, de l'Irak, du Shâm et de l'Égypte. Il établit le calendrier hijri, le système de justice, le trésor public. Le Prophète ﷺ dit : 'Si après moi il y avait un prophète, ce serait 'Umar' [At-Tirmidhi]."},
+{name:"'Uthman ibn 'Affân",ar:"عثمان بن عفان",bio:"Troisième calife, surnommé Dhun-Nûrayn (l'homme aux deux lumières) car il épousa deux filles du Prophète ﷺ. Extrêmement généreux, il acheta le puits de Rûma pour les musulmans et équipa l'armée de Tabûk. Il compila le Coran en un seul mushaf standardisé — une contribution immense à la préservation du Livre d'Allah."},
+{name:"'Ali ibn Abi Tâlib",ar:"علي بن أبي طالب",bio:"Quatrième calife, cousin et gendre du Prophète ﷺ. Premier enfant à embrasser l'Islam. Le Prophète ﷺ lui dit : 'Tu es pour moi ce que Hârun était pour Musa, sauf qu'il n'y a pas de prophète après moi' [Bukhari & Muslim]. Connu pour sa bravoure (Lion d'Allah) et sa science profonde. Il dormit dans le lit du Prophète ﷺ la nuit de la Hijra."},
+{name:"Talha ibn 'Ubaydillah",ar:"طلحة بن عبيد الله",bio:"L'un des premiers convertis. À Uhud, il protégea le Prophète ﷺ de son corps, recevant plus de 70 blessures. Le Prophète ﷺ dit : 'Celui qui veut voir un martyr marchant sur terre, qu'il regarde Talha' [At-Tirmidhi]. Sa main fut paralysée en protégeant le visage du Prophète ﷺ."},
+{name:"Az-Zubayr ibn al-'Awwâm",ar:"الزبير بن العوام",bio:"Neveu de Khadîja et cousin du Prophète ﷺ. Premier à dégainer l'épée pour l'Islam. Il combattit dans toutes les batailles. Le Prophète ﷺ dit : 'Chaque prophète a un apôtre (hawârî) et mon apôtre est Az-Zubayr' [Bukhari & Muslim]. Cavalier courageux et stratège militaire."},
+{name:"'Abd ar-Rahmân ibn 'Awf",ar:"عبد الرحمن بن عوف",bio:"Commerçant prospère qui donna la moitié de sa fortune en arrivant à Médine. Extrêmement généreux, il équipa des armées entières. Le Prophète ﷺ pria pour la bénédiction de ses biens. Il refusa d'être candidat au califat pour servir comme arbitre lors de la choura (consultation)."},
+{name:"Sa'd ibn Abi Waqqâs",ar:"سعد بن أبي وقاص",bio:"Le premier à tirer une flèche pour l'Islam. Commandant de l'armée qui conquit la Perse (bataille d'Al-Qâdisiyyah). Le Prophète ﷺ dit : 'Tire, Sa'd ! Que mon père et ma mère soient sacrifiés pour toi !' [Bukhari]. Connu pour ses invocations exaucées — le Prophète ﷺ invoqua pour lui."},
+{name:"Sa'îd ibn Zayd",ar:"سعيد بن زيد",bio:"Se convertit très tôt avec sa femme Fâtima, sœur de 'Umar. C'est en rendant visite à sa sœur que 'Umar entendit le Coran et se convertit. Sa'îd participa à toutes les batailles sauf Badr (en mission). Le Prophète ﷺ témoigna qu'il est au Paradis."},
+{name:"Abu 'Ubayda ibn al-Jarrâh",ar:"أبو عبيدة بن الجراح",bio:"Surnommé 'Amîn al-Umma' (le garant de la communauté) par le Prophète ﷺ [Bukhari & Muslim]. Commandant en chef des armées du Shâm sous 'Umar. D'une humilité et d'une piété exemplaires. Il refusa les honneurs et vécut simplement malgré ses conquêtes."}
+];
+
+const BATTLES=[
+{name:"Bataille de Badr",date:"17 Ramadan, an 2 H (624)",desc:"Première grande bataille de l'Islam. 313 musulmans contre environ 1000 Qurayshites. Victoire miraculeuse par le secours d'Allah qui envoya des anges combattre : 'Oui, si vous êtes patients et pieux et qu'ils viennent contre vous, votre Seigneur vous enverra cinq mille anges' [Al Imran 3:125]. 70 mécréants tués dont Abu Jahl, 70 capturés. 14 martyrs musulmans.",ref:"[Al-Anfal 8:1-75, Al Imran 3:123-127]"},
+{name:"Bataille d'Uhud",date:"Shawwal, an 3 H (625)",desc:"Les Quraysh revinrent avec 3000 hommes. Le Prophète ﷺ plaça 50 archers sur le mont avec l'ordre de ne pas bouger. Les musulmans gagnaient, mais les archers quittèrent leur poste pour le butin. Khâlid ibn al-Walîd contourna et attaqua. Le Prophète ﷺ fut blessé au visage. 70 martyrs dont Hamza. Leçon : l'obéissance au commandement est obligatoire.",ref:"[Al Imran 3:121-175]"},
+{name:"Bataille d'Al-Khandaq (la Tranchée)",date:"Shawwal, an 5 H (627)",desc:"10 000 coalisés assiégèrent Médine. Sur conseil de Salmân al-Fârisî, une tranchée fut creusée. Le siège dura un mois. Allah envoya un vent violent et des armées invisibles : 'Ô vous qui croyez, rappelez-vous le bienfait d'Allah quand les armées vinrent contre vous, et Nous envoyâmes un vent et des armées que vous ne voyiez pas' [Al-Ahzab 33:9]. Les coalisés se retirèrent sans combattre.",ref:"[Al-Ahzab 33:9-27]"},
+{name:"Traité de Hudaybiya",date:"Dhul Qi'dah, an 6 H (628)",desc:"Le Prophète ﷺ et 1400 compagnons partirent en 'Umra. Quraysh les bloqua. Un traité de paix de 10 ans fut signé. Les compagnons furent déçus mais Allah révéla : 'Nous t'avons accordé une victoire éclatante' [Al-Fath 48:1]. Ce traité permit la propagation de l'Islam en paix.",ref:"[Al-Fath 48:1-29]"},
+{name:"Conquête de La Mecque (Fath Makkah)",date:"Ramadan, an 8 H (630)",desc:"10 000 musulmans entrèrent à La Mecque presque sans combattre. Le Prophète ﷺ entra humblement, la tête baissée sur sa monture. Il brisa les 360 idoles de la Ka'ba en récitant : 'La vérité est venue et le faux a disparu' [Al-Isra 17:81]. Il pardonna à tous les Qurayshites : 'Allez, vous êtes libres.' Exemple suprême de pardon.",ref:"[An-Nasr 110:1-3, Al-Isra 17:81]"},
+{name:"Bataille de Hunayn",date:"Shawwal, an 8 H (630)",desc:"Après la conquête de La Mecque, 12 000 musulmans affrontèrent les tribus de Hawâzin et Thaqîf. Début difficile : les musulmans, trop confiants dans leur nombre, furent surpris par une embuscade. Allah rappela : 'Le jour de Hunayn, quand votre grand nombre vous remplissait d'orgueil' [At-Tawbah 9:25]. Le Prophète ﷺ resta ferme et les musulmans se regroupèrent pour vaincre.",ref:"[At-Tawbah 9:25-26]"}
+];
+
+const WOMEN=[
+{name:"Khadîja bint Khuwaylid",ar:"خديجة بنت خويلد",bio:"Première épouse du Prophète ﷺ et première personne à embrasser l'Islam. Riche commerçante respectée, elle proposa le mariage au Prophète ﷺ. Elle le soutint inconditionnellement quand la révélation commença : 'Non, par Allah, Allah ne te déshonorera jamais' [Bukhari]. Elle dépensa toute sa fortune pour l'Islam. Le Prophète ﷺ dit : 'La meilleure des femmes de son temps est Maryam, et la meilleure des femmes de son temps est Khadîja' [Bukhari]. Jibrîl lui transmit le salâm d'Allah et la bonne nouvelle du Paradis."},
+{name:"'Aïsha bint Abi Bakr",ar:"عائشة بنت أبي بكر",bio:"Épouse du Prophète ﷺ, fille d'Abu Bakr. Surnommée 'la véridique fille du véridique'. La plus savante des femmes de cette communauté. Elle rapporta plus de 2200 hadiths. Les plus grands Compagnons venaient la consulter en matière de fiqh. Le Prophète ﷺ dit : 'Prenez la moitié de votre religion de cette femme rousse' (c'est-à-dire 'Aïsha). Elle enseigna après la mort du Prophète ﷺ pendant des décennies."},
+{name:"Fâtima az-Zahrâ'",ar:"فاطمة الزهراء",bio:"Fille du Prophète ﷺ et de Khadîja, épouse de 'Ali, mère de Hassan et Husayn. Le Prophète ﷺ dit : 'Fâtima est la maîtresse des femmes du Paradis' [Bukhari]. Elle ressemblait le plus au Prophète ﷺ dans sa démarche et son comportement. Elle vécut dans la simplicité et mourut 6 mois après le Prophète ﷺ."},
+{name:"Maryam bint 'Imrân",ar:"مريم بنت عمران",bio:"Mère de 'Isa, seule femme nommée dans le Coran (une sourate porte son nom). Allah l'a choisie et purifiée au-dessus de toutes les femmes des mondes [Al Imran 3:42]. Elle conçut 'Isa miraculeusement par le décret d'Allah. Exemple suprême de chasteté, de piété et de confiance en Allah. Elle accoucha seule sous un palmier et Allah la nourrit de dattes fraîches et d'une source [Maryam 19:23-26]."},
+{name:"Âsiya bint Muzâhim",ar:"آسية بنت مزاحم",bio:"Épouse de Pharaon, elle crut en Allah malgré la tyrannie de son mari. Elle recueillit et protégea Musa bébé. Elle invoqua : 'Mon Seigneur, construis-moi auprès de Toi une maison au Paradis, sauve-moi de Pharaon et de ses actes, sauve-moi du peuple injuste' [At-Tahrim 66:11]. Pharaon la tortura mais elle resta ferme dans sa foi. Le Prophète ﷺ dit qu'elle est parmi les meilleures femmes du Paradis [Bukhari]."},
+{name:"Umm Salama",ar:"أم سلمة",bio:"Épouse du Prophète ﷺ. Quand son premier mari Abu Salama mourut, elle récita l'invocation de l'épreuve : 'Innâ lillâhi wa innâ ilayhi râji'ûn, Allâhumma ajurnî fî musîbatî...' Allah la remplaça par le meilleur mari : le Prophète ﷺ [Muslim]. Elle était connue pour sa sagesse et ses conseils avisés, notamment lors du traité de Hudaybiya."},
+{name:"Sumayya bint Khayyât",ar:"سمية بنت خياط",bio:"Première martyre de l'Islam. Avec son mari Yâsir et leur fils 'Ammâr, elle fut torturée par Abu Jahl pour avoir embrassé l'Islam. Le Prophète ﷺ passant devant eux dit : 'Patience, famille de Yâsir ! Votre rendez-vous est le Paradis' [Al-Hâkim]. Abu Jahl la tua d'un coup de lance. Son sacrifice est un symbole de fermeté dans la foi."}
+];
+
+const QURAN_STORIES=[
+{name:"Les Gens de la Caverne (Ashâb al-Kahf)",ref:"[Al-Kahf 18:9-26]",summary:"De jeunes croyants fuirent un roi tyrannique idolâtre. Ils se réfugièrent dans une caverne. Allah les endormit pendant 309 ans puis les réveilla. Leur chien gardait l'entrée. Quand ils envoyèrent l'un d'eux acheter de la nourriture, il découvrit que des siècles avaient passé. Leçon : la puissance d'Allah est sans limite, la résurrection est une réalité, et la foi des jeunes est précieuse."},
+{name:"Dhul-Qarnayn",ref:"[Al-Kahf 18:83-98]",summary:"Roi pieux et puissant à qui Allah donna le pouvoir de parcourir la terre. Il voyagea vers l'ouest, l'est, et le nord. Il trouva un peuple opprimé par Ya'juj et Ma'juj (Gog et Magog). Il construisit une immense barrière de fer et de cuivre fondu pour les contenir. Il dit : 'C'est une miséricorde de mon Seigneur. Quand la promesse de mon Seigneur viendra, Il la mettra en pièces' [Al-Kahf 18:98]. Leçon : utiliser le pouvoir pour le bien et aider les opprimés."},
+{name:"Luqmân le Sage",ref:"[Luqman 31:12-19]",summary:"Luqmân reçut la sagesse d'Allah. Il enseigna à son fils des principes fondamentaux : 'Ô mon fils, n'associe rien à Allah. Le Shirk est une injustice énorme' [31:13]. 'Ô mon fils, accomplis la prière, ordonne le bien, interdis le mal, et patiente' [31:17]. 'Ne détourne pas ton visage des gens par orgueil et ne marche pas sur terre avec arrogance' [31:18]. Leçon : l'éducation des enfants commence par le Tawhîd."},
+{name:"Les Compagnons de l'Éléphant (Ashâb al-Fîl)",ref:"[Al-Fil 105:1-5]",summary:"Abraha, roi du Yémen, voulut détruire la Ka'ba avec une armée et un éléphant. Allah envoya des oiseaux (Abâbîl) qui lancèrent des pierres d'argile cuite, détruisant l'armée. Cet événement eut lieu l'année de la naissance du Prophète ﷺ (Année de l'Éléphant). Leçon : Allah protège Sa maison sacrée."},
+{name:"Le Prophète ﷺ et l'Isrâ' wal-Mi'râj",ref:"[Al-Isra 17:1, An-Najm 53:1-18]",summary:"En une nuit, le Prophète ﷺ fut transporté de La Mecque à Jérusalem (Isrâ') sur al-Burâq, puis élevé aux sept cieux (Mi'râj). Il rencontra les prophètes : Adam au 1er ciel, 'Isa et Yahya au 2ème, Yusuf au 3ème, Idris au 4ème, Hârun au 5ème, Musa au 6ème, Ibrahim au 7ème. Allah lui prescrivit les 50 prières, réduites à 5 sur conseil de Musa. Leçon : la grandeur du Prophète ﷺ et l'importance de la prière."}
+];
+
+const MAJOR_SINS=[
+{name:"Le Shirk (associer à Allah)",desc:"Le plus grand péché. Allah dit : 'Allah ne pardonne pas qu'on Lui donne des associés, mais Il pardonne ce qui est en deçà à qui Il veut' [An-Nisa 4:48]. Exemples : invoquer les morts, demander secours aux saints, se prosterner devant des tombes, porter des amulettes en croyant qu'elles protègent par elles-mêmes.",ref:"[An-Nisa 4:48, Al-Ma'idah 5:72]"},
+{name:"Le meurtre injuste",desc:"Allah dit : 'Quiconque tue un croyant intentionnellement, sa rétribution sera l'Enfer pour y demeurer éternellement' [An-Nisa 4:93]. Le Prophète ﷺ dit : 'Le premier jugement rendu entre les gens le Jour du Jugement concernera le sang (les meurtres)' [Bukhari & Muslim].",ref:"[An-Nisa 4:93, Al-Isra 17:33]"},
+{name:"La magie (as-Sihr)",desc:"Allah dit à propos des deux anges : 'Ils enseignaient la magie aux gens, mais disaient : Nous ne sommes qu'une tentation, ne deviens pas mécréant' [Al-Baqarah 2:102]. La magie implique souvent le Shirk (alliance avec les démons). Le Prophète ﷺ la compta parmi les 7 péchés destructeurs [Bukhari & Muslim].",ref:"[Al-Baqarah 2:102]"},
+{name:"Abandonner la prière",desc:"Le Prophète ﷺ dit : 'Entre l'homme et le Shirk/Kufr, il y a l'abandon de la prière' [Muslim]. Ibn Taymiyya et les savants salafistes considèrent que celui qui abandonne totalement la prière par négligence est mécréant selon l'avis le plus correct.",ref:"[Muslim, At-Tawbah 9:11]"},
+{name:"L'usure (ar-Ribâ)",desc:"Allah dit : 'Allah a rendu licite le commerce et interdit le Ribâ' [Al-Baqarah 2:275]. Le Prophète ﷺ maudit celui qui prend le Ribâ, celui qui le donne, celui qui l'écrit et les deux témoins [Muslim]. Plus grave que commettre l'adultère 36 fois selon un hadith dans Musnad Ahmad.",ref:"[Al-Baqarah 2:275-279]"},
+{name:"Manger l'argent de l'orphelin",desc:"Allah dit : 'Ceux qui mangent injustement les biens des orphelins ne font que manger du Feu dans leurs ventres' [An-Nisa 4:10]. Le Prophète ﷺ classa cela parmi les 7 péchés destructeurs [Bukhari & Muslim].",ref:"[An-Nisa 4:10]"},
+{name:"La désertion du combat (fuir le jihad légitime)",desc:"Allah dit : 'Quiconque leur tourne le dos ce jour-là, à moins de changer de stratégie ou de se rallier à un autre groupe, encourt la colère d'Allah et son refuge est l'Enfer' [Al-Anfal 8:16]. Compté parmi les 7 péchés destructeurs [Bukhari & Muslim].",ref:"[Al-Anfal 8:16]"}
+];
+
+const NAWAQID=[
+{name:"1. Le Shirk dans l'adoration",desc:"Associer quoi que ce soit à Allah dans l'adoration : invoquer autre qu'Allah, sacrifier pour autre qu'Allah, faire des vœux à autre qu'Allah. 'Quiconque donne un associé à Allah, Allah lui interdit le Paradis' [Al-Ma'idah 5:72]."},
+{name:"2. Prendre des intermédiaires entre soi et Allah",desc:"Invoquer les morts ou les saints comme intercesseurs auprès d'Allah, leur demander de l'aide. Ceci est le Shirk des premiers polythéistes : 'Nous ne les adorons que pour qu'ils nous rapprochent d'Allah' [Az-Zumar 39:3]."},
+{name:"3. Ne pas considérer les polythéistes comme mécréants",desc:"Celui qui ne considère pas les mushrikin comme mécréants, ou doute de leur mécréance, ou valide leur voie, est lui-même mécréant par consensus."},
+{name:"4. Croire qu'une guidance autre que celle du Prophète ﷺ est meilleure",desc:"Croire qu'un autre système (lois humaines, philosophie, etc.) est supérieur ou égal à la législation du Prophète ﷺ."},
+{name:"5. Détester une chose venue du Prophète ﷺ",desc:"Même si on la pratique. 'Car ils ont détesté ce qu'Allah a révélé, alors Il a rendu vaines leurs œuvres' [Muhammad 47:9]."},
+{name:"6. Se moquer de la religion",desc:"Se moquer d'Allah, du Coran, du Prophète ﷺ ou d'un aspect de l'Islam. 'Dis : Était-ce d'Allah, de Ses versets et de Son Messager que vous vous moquiez ? Ne vous excusez pas, vous avez mécru après avoir cru' [At-Tawbah 9:65-66]."},
+{name:"7. La magie (Sihr)",desc:"Pratiquer ou approuver la magie. Cela inclut le détournement (sarf) et l'attachement ('atf). 'Le magicien ne réussit pas où qu'il soit' [Ta-Ha 20:69]."},
+{name:"8. Soutenir les mécréants contre les musulmans",desc:"Aider les mécréants contre les musulmans en les soutenant militairement ou stratégiquement. 'Quiconque parmi vous les prend comme alliés est des leurs' [Al-Ma'idah 5:51]."},
+{name:"9. Croire que certaines personnes peuvent sortir de la Shari'a",desc:"Comme les soufis extrêmes qui prétendent que le 'saint' n'a plus besoin de prier ou de suivre la Shari'a."},
+{name:"10. Se détourner totalement de la religion d'Allah",desc:"Ne pas l'apprendre, ne pas la pratiquer, s'en désintéresser complètement. 'Qui est plus injuste que celui qui, rappelé des versets de son Seigneur, s'en détourne ?' [As-Sajdah 32:22]."}
+];
+
+const MIRACLES=[
+{name:"La création des cieux et de la terre",desc:"Le Coran mentionne l'expansion de l'univers 1400 ans avant Hubble : 'Le ciel, Nous l'avons construit par Notre puissance et Nous l'étendons continuellement' [Adh-Dhariyat 51:47]. Les scientifiques n'ont découvert l'expansion de l'univers qu'en 1929.",ref:"[Adh-Dhariyat 51:47]"},
+{name:"Les étapes de l'embryon",desc:"Le Coran décrit les stades du développement embryonnaire avec une précision remarquable : nutfa (goutte), 'alaqa (adhérence/sangsue), mudgha (morceau mâché), puis os et chair [Al-Mu'minun 23:12-14]. Cette description correspond aux stades identifiés par l'embryologie moderne.",ref:"[Al-Mu'minun 23:12-14]"},
+{name:"La barrière entre les deux mers",desc:"'Il a donné libre cours aux deux mers pour se rencontrer. Il y a entre elles une barrière qu'elles ne dépassent pas' [Ar-Rahman 55:19-20]. Les océanographes ont confirmé que les mers adjacentes de salinité différente ne se mélangent pas grâce à une barrière de densité.",ref:"[Ar-Rahman 55:19-20]"},
+{name:"Les montagnes comme piliers",desc:"'N'avons-Nous pas fait de la terre un lit et des montagnes des piquets ?' [An-Naba 78:6-7]. La géologie moderne a confirmé que les montagnes ont des racines profondes qui stabilisent la croûte terrestre, comme des piquets enfoncés dans le sol.",ref:"[An-Naba 78:6-7, An-Nahl 16:15]"},
+{name:"L'inimitabilité linguistique (I'jâz)",desc:"Allah a défié toute l'humanité de produire ne serait-ce qu'une sourate semblable : 'Si vous avez un doute sur ce que Nous avons révélé à Notre serviteur, produisez une sourate semblable' [Al-Baqarah 2:23]. En 1400 ans, personne n'a relevé ce défi. Les plus grands poètes arabes ont reconnu la supériorité absolue du style coranique.",ref:"[Al-Baqarah 2:23, Al-Isra 17:88]"},
+{name:"La préservation du Coran",desc:"'C'est Nous qui avons fait descendre le Rappel et c'est Nous qui en sommes les gardiens' [Al-Hijr 15:9]. Aucun livre au monde n'a été préservé comme le Coran : pas un seul mot n'a changé en 1400 ans, mémorisé par des millions de personnes dans le monde, le même texte d'est en ouest.",ref:"[Al-Hijr 15:9]"},
+{name:"Le corps de Pharaon préservé",desc:"'Aujourd'hui, Nous te sauvons en ton corps afin que tu sois un signe pour ceux qui viendront après toi' [Yunus 10:92]. Le corps momifié de Ramsès II (considéré par beaucoup comme le Pharaon de Musa) est exposé au Musée du Caire — préservé exactement comme Allah l'a promis.",ref:"[Yunus 10:92]"}
+];
+
+// GLOSSARY — ENRICHED
+const GLOSSARY=[
+{term:"Tawhîd (تَوْحِيد)",def:"L'unicité d'Allah. Le fondement absolu de l'Islam. Se divise en 3 catégories :\n• Tawhîd ar-Rububiyyah : Allah est le seul Créateur, Pourvoyeur, Maître de l'univers.\n• Tawhîd al-Uluhiyyah : Allah est le seul qui mérite l'adoration (prière, du'a, sacrifice...).\n• Tawhîd al-Asma wa as-Sifat : Affirmer les noms et attributs d'Allah tels qu'Il les a décrits.\nExemple : Même les polythéistes de Quraysh reconnaissaient le Tawhîd ar-Rububiyyah, mais rejetaient le Tawhîd al-Uluhiyyah en adorant les idoles à côté d'Allah."},
+{term:"Shirk (شِرْك)",def:"L'association à Allah — le plus grand péché. Allah dit : « Certes Allah ne pardonne pas qu'on Lui donne des associés » [An-Nisa 4:48].\n• Shirk majeur (akbar) : adorer autre qu'Allah (invoquer les morts, se prosterner devant des tombes). Annule l'Islam.\n• Shirk mineur (asghar) : comme le riyâ' (ostentation dans l'adoration), jurer par autre qu'Allah.\nExemple : Demander à un mort de nous aider est du Shirk majeur, même s'il s'agit d'un prophète ou d'un saint."},
+{term:"Sunnah (سُنَّة)",def:"La voie du Prophète ﷺ : ses paroles (qawl), ses actes (fi'l), ses approbations (taqrîr) et ses caractéristiques (sifa). C'est la deuxième source de législation après le Coran.\nExemple : Le Prophète ﷺ priait la nuit (Qiyam al-Layl). Si quelqu'un le fait, il suit la Sunnah. Si le Prophète ﷺ a vu quelqu'un faire quelque chose et ne l'a pas interdit, c'est une approbation."},
+{term:"Bid'a (بِدْعَة)",def:"Innovation dans la religion — ajouter dans l'adoration ce que ni le Prophète ﷺ ni ses Compagnons n'ont pratiqué. Le Prophète ﷺ a dit : « Toute innovation est un égarement, et tout égarement est au Feu. » [Muslim]\nExemple : Célébrer le Mawlid (anniversaire du Prophète ﷺ) est une bid'a car ni lui, ni les Compagnons, ni les Tabi'in ne l'ont fait. La bonne intention ne justifie pas la bid'a."},
+{term:"Manhaj (مَنْهَج)",def:"La méthodologie, la voie suivie dans la compréhension et la pratique de l'Islam. Le manhaj salafi consiste à comprendre le Coran et la Sunnah selon la compréhension des trois premières générations (Salaf).\nExemple : Quand les soufis pratiquent le dhikr en groupe avec des danses, ce n'est pas le manhaj des Salaf. Le manhaj correct est de faire le dhikr comme le Prophète ﷺ l'a enseigné."},
+{term:"Salaf (سَلَف)",def:"Les pieux prédécesseurs. Désigne spécifiquement les trois premières générations de musulmans que le Prophète ﷺ a qualifiées de meilleures : « Les meilleurs des gens sont ma génération (les Compagnons), puis ceux qui les suivent (Tabi'in), puis ceux qui les suivent (Tabi' at-Tabi'in). » [Bukhari & Muslim]"},
+{term:"'Aqîda (عَقِيدَة)",def:"La croyance, le dogme. L'ensemble des convictions du cœur sur lesquelles repose la foi du musulman : l'existence d'Allah, Ses attributs, les anges, les livres, les messagers, le Jour Dernier, le destin.\nExemple : Croire qu'Allah est au-dessus de Son Trône (al-'Arsh) fait partie de la 'aqîda correcte, comme l'ont affirmé les Salaf."},
+{term:"Fiqh (فِقْه)",def:"La jurisprudence islamique. La compréhension des règles pratiques (ahkâm) tirées du Coran et de la Sunnah. Couvre les domaines de l'adoration ('ibâdât), des transactions (mu'âmalât), du mariage (nikâh), etc.\nLes 4 écoles : Hanafite, Malikite, Shafi'ite, Hanbalite. Le salafi suit la preuve (dalîl) plutôt que le suivi aveugle (taqlîd) d'une école."},
+{term:"Hadith (حَدِيث)",def:"Récit rapportant les paroles, actes ou approbations du Prophète ﷺ. Chaque hadith se compose de deux parties :\n• Al-Isnâd (chaîne de transmission) : la liste des rapporteurs.\n• Al-Matn (texte) : le contenu du hadith.\nLes hadiths sont classés par authenticité : Sahîh (authentique), Hasan (bon), Da'if (faible), Mawdû' (inventé)."},
+{term:"Sahîh (صَحِيح)",def:"Authentique. Grade le plus élevé d'un hadith. Conditions : chaîne continue, tous les rapporteurs sont dignes de confiance ('adl) et précis (dâbit), pas d'anomalie (shâdh) ni de défaut caché ('illa).\nExemple : Les hadiths dans Sahîh al-Bukhari et Sahîh Muslim sont tous considérés Sahîh par consensus."},
+{term:"Hasan (حَسَن)",def:"Bon. Hadith dont la chaîne est acceptable mais un des rapporteurs est légèrement inférieur en précision par rapport au Sahîh. Il est utilisable comme preuve.\nExemple : Beaucoup de hadiths dans les Sunan (Abu Dawud, At-Tirmidhi) sont Hasan."},
+{term:"Da'if (ضَعِيف)",def:"Faible. Hadith dont la chaîne comporte un défaut : rapporteur inconnu, mauvaise mémoire, chaîne interrompue, etc. Ne peut servir de preuve en matière de croyance ou de législation selon la position de la majorité des muhaddithin salafistes.\nNote : Certains savants l'acceptent pour les vertus (fadâ'il), mais Al-Albani et d'autres le rejettent même dans ce cas."},
+{term:"Ijma' (إِجْمَاع)",def:"Le consensus des savants musulmans d'une époque sur une question religieuse. C'est la 3ème source de législation après le Coran et la Sunnah.\nExemple : Il y a Ijma' sur l'obligation des 5 prières, du jeûne de Ramadan, de la Zakat. Quiconque nie ces obligations sort de l'Islam par Ijma'."},
+{term:"Ijtihad (اِجْتِهَاد)",def:"L'effort de réflexion d'un savant qualifié (mujtahid) pour déduire une règle des sources quand il n'y a pas de texte explicite.\nConditions : maîtrise du Coran, de la Sunnah, de la langue arabe, des Usûl al-Fiqh. Le mujtahid qui se trompe a une récompense, celui qui a juste en a deux. [Bukhari & Muslim]"},
+{term:"Tafsir (تَفْسِير)",def:"L'explication et l'interprétation du Coran. L'ordre de priorité pour le tafsir :\n1. Le Coran explique le Coran.\n2. La Sunnah explique le Coran.\n3. Les paroles des Compagnons.\n4. Les paroles des Tabi'in.\n5. La langue arabe.\nTafsirs salafistes recommandés : Ibn Kathir, As-Sa'di, At-Tabari."},
+{term:"Takfir (تَكْفِير)",def:"Le fait de déclarer quelqu'un mécréant (kâfir). C'est un sujet extrêmement grave avec des conditions strictes :\n1. L'acte doit être du kufr établi par les preuves.\n2. Les conditions doivent être réunies (connaissance, choix, compréhension).\n3. Les empêchements doivent être vérifiés (ignorance, contrainte, mauvaise interprétation).\nLe Prophète ﷺ a dit : « Quiconque dit à son frère 'ô mécréant', l'un des deux mérite ce titre. » [Bukhari]"},
+{term:"Tawbah (تَوْبَة)",def:"Le repentir. Allah l'accepte à condition de :\n1. Regretter sincèrement le péché.\n2. Cesser immédiatement le péché.\n3. Avoir la ferme intention de ne pas recommencer.\n4. Si le péché concerne le droit d'autrui : rendre le droit.\n« Certes Allah aime ceux qui se repentent et ceux qui se purifient. » [Al-Baqarah 2:222]. Le repentir est accepté tant que le soleil ne se lève pas de l'ouest ou que l'agonie n'a pas commencé."},
+{term:"Qadar (قَدَر)",def:"Le destin, la prédestination. 6ème pilier de la foi. Croire que tout — le bien et le mal — a été décrété par Allah. 4 niveaux :\n1. Al-'Ilm : Allah sait tout de toute éternité.\n2. Al-Kitâba : Tout est écrit dans la Table Gardée (al-Lawh al-Mahfûz).\n3. Al-Mashî'a : Rien ne se produit sans la volonté d'Allah.\n4. Al-Khalq : Allah est le Créateur de toute chose, y compris les actes des serviteurs.\nCroire au Qadar ne dispense pas de faire les causes (asbâb)."},
+{term:"Wala' wal-Bara' (الولاء والبراء)",def:"L'alliance et le désaveu. Principe fondamental : aimer et s'allier aux croyants (Wala'), se désavouer du Shirk et de ses adeptes (Bara'). Ne signifie pas maltraiter les non-musulmans, mais ne pas aimer leur mécréance ni imiter leurs pratiques religieuses.\n« Tu ne trouveras pas un peuple qui croit en Allah et au Jour Dernier avoir de l'affection pour ceux qui s'opposent à Allah et Son Messager. » [Al-Mujadilah 58:22]"},
+{term:"Rizq (رِزْق)",def:"La subsistance qu'Allah accorde à chaque créature. Le rizq est décrété avant la naissance : « Pas une créature sur terre dont la subsistance n'incombe à Allah. » [Hud 11:6]. Le rizq ne se limite pas à l'argent : la santé, les enfants, la science, la foi sont aussi du rizq. Chercher le rizq est un acte d'adoration quand il est fait avec l'intention correcte."},
+{term:"Dhikr (ذِكْر)",def:"Le rappel d'Allah par la langue et le cœur. Allah dit : « Invoquez-Moi, Je vous répondrai. » [Ghafir 40:60]. Formes de dhikr : SubhanAllah, Alhamdulillah, Allahu Akbar, Lâ ilâha illallâh, la récitation du Coran, le du'a. Le Prophète ﷺ a dit : « La différence entre celui qui invoque Allah et celui qui ne l'invoque pas est comme la différence entre le vivant et le mort. » [Bukhari]"}
+];
+
+// DU'A BY SITUATION — ENRICHED
+const DUAS=[
+{cat:"🍽️ Repas",items:[
+{title:"Avant de manger",ar:"بِسْمِ اللهِ",fr:"Au nom d'Allah.",ref:"Muslim",context:"Le Prophète ﷺ a dit : « Quand l'un de vous mange, qu'il mentionne le nom d'Allah. S'il oublie au début, qu'il dise : Bismillahi fi awwalihi wa akhirihi (Au nom d'Allah au début et à la fin). » [Abu Dawud, Sahîh]"},
+{title:"Après avoir mangé",ar:"الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنِي هَذَا وَرَزَقَنِيهِ مِنْ غَيْرِ حَوْلٍ مِنِّي وَلَا قُوَّةٍ",fr:"Louange à Allah qui m'a nourri de ceci et me l'a accordé sans effort ni force de ma part.",ref:"Abu Dawud, At-Tirmidhi",context:"Celui qui dit cela après avoir mangé, ses péchés passés lui sont pardonnés. [At-Tirmidhi, Hasan]"},
+{title:"Quand on est invité",ar:"اللَّهُمَّ بَارِكْ لَهُمْ فِيمَا رَزَقْتَهُمْ وَاغْفِرْ لَهُمْ وَارْحَمْهُمْ",fr:"Ô Allah, bénis ce que Tu leur as accordé, pardonne-leur et fais-leur miséricorde.",ref:"Muslim",context:"Du'a que le Prophète ﷺ faisait quand il mangeait chez quelqu'un."},
+{title:"En buvant du lait",ar:"اللَّهُمَّ بَارِكْ لَنَا فِيهِ وَزِدْنَا مِنْهُ",fr:"Ô Allah, bénis-nous en cela et donne-nous en davantage.",ref:"At-Tirmidhi",context:"Le lait est le seul aliment pour lequel on demande 'plus', car il est à la fois nourriture et boisson."}
+]},
+{cat:"😴 Sommeil",items:[
+{title:"Avant de dormir",ar:"بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا",fr:"En Ton nom, ô Allah, je meurs et je vis.",ref:"Bukhari",context:"Le sommeil est comparé à une petite mort. Le Prophète ﷺ recommandait de dormir en état de pureté (wudu), sur le côté droit, en récitant Ayat al-Kursi et les 3 dernières sourates."},
+{title:"Au réveil",ar:"الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ",fr:"Louange à Allah qui nous a redonné la vie après nous avoir fait mourir, et vers Lui est la résurrection.",ref:"Bukhari",context:"Première parole à prononcer en ouvrant les yeux — un rappel quotidien que chaque jour est un don d'Allah."},
+{title:"En cas d'insomnie",ar:"لَا إِلَهَ إِلَّا اللهُ الْوَاحِدُ الْقَهَّارُ رَبُّ السَّمَاوَاتِ وَالْأَرْضِ وَمَا بَيْنَهُمَا الْعَزِيزُ الْغَفَّارُ",fr:"Nulle divinité sauf Allah, l'Unique, le Dominateur, Seigneur des cieux et de la terre et de ce qui est entre eux, le Tout-Puissant, le Pardonneur.",ref:"Al-Hakim",context:"Le Prophète ﷺ recommandait cette invocation à celui qui ne trouve pas le sommeil."},
+{title:"En cas de cauchemar",ar:"أَعُوذُ بِكَلِمَاتِ اللهِ التَّامَّاتِ مِنْ غَضَبِهِ وَعِقَابِهِ وَشَرِّ عِبَادِهِ",fr:"Je cherche refuge auprès des paroles parfaites d'Allah contre Sa colère, Son châtiment et le mal de Ses serviteurs.",ref:"Abu Dawud",context:"En cas de mauvais rêve : cracher 3 fois à gauche (sans salive), changer de côté, ne pas raconter le rêve, et chercher refuge auprès d'Allah. [Muslim]"}
+]},
+{cat:"🚗 Voyage",items:[
+{title:"En montant dans un véhicule",ar:"سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ وَإِنَّا إِلَى رَبِّنَا لَمُنْقَلِبُونَ",fr:"Gloire à Celui qui a mis ceci à notre service alors que nous n'étions pas capables de le faire, et vers notre Seigneur est notre retour.",ref:"Muslim, Az-Zukhruf 43:13-14",context:"Ce verset coranique est la sunnah à réciter en montant dans tout moyen de transport — voiture, avion, bateau, etc."},
+{title:"Du'a complète du voyage",ar:"اللَّهُمَّ إِنَّا نَسْأَلُكَ فِي سَفَرِنَا هَذَا الْبِرَّ وَالتَّقْوَى وَمِنَ الْعَمَلِ مَا تَرْضَى",fr:"Ô Allah, nous Te demandons dans ce voyage la piété, la crainte, et des actes qui Te satisfassent.",ref:"Muslim",context:"Le Prophète ﷺ récitait cette du'a à chaque départ en voyage. Il ajoutait : 'Ô Allah, facilite-nous ce voyage et rapproche-nous sa distance.'"},
+{title:"Au retour de voyage",ar:"آيِبُونَ تَائِبُونَ عَابِدُونَ لِرَبِّنَا حَامِدُونَ",fr:"Nous retournons repentants, adorateurs et louangeurs de notre Seigneur.",ref:"Bukhari & Muslim",context:"À réciter en rentrant chez soi après un voyage."}
+]},
+{cat:"🤒 Maladie",items:[
+{title:"Visite d'un malade",ar:"لَا بَأْسَ طَهُورٌ إِنْ شَاءَ اللهُ",fr:"Pas de mal, c'est une purification si Allah le veut.",ref:"Bukhari",context:"Le Prophète ﷺ visitait les malades et leur disait ces paroles réconfortantes. La maladie purifie le croyant de ses péchés comme le feu purifie l'or."},
+{title:"Demande de guérison",ar:"اللَّهُمَّ رَبَّ النَّاسِ أَذْهِبِ الْبَأْسَ اشْفِ أَنْتَ الشَّافِي لَا شِفَاءَ إِلَّا شِفَاؤُكَ شِفَاءً لَا يُغَادِرُ سَقَمًا",fr:"Ô Allah, Seigneur des gens, ôte le mal. Guéris, Tu es le Guérisseur, il n'y a de guérison que la Tienne, une guérison qui ne laisse aucune maladie.",ref:"Bukhari & Muslim",context:"Le Prophète ﷺ posait sa main droite sur le malade et récitait cette invocation. La guérison vient uniquement d'Allah."},
+{title:"Quand on souffre",ar:"أَعُوذُ بِعِزَّةِ اللهِ وَقُدْرَتِهِ مِنْ شَرِّ مَا أَجِدُ وَأُحَاذِرُ",fr:"Je cherche refuge auprès de la puissance d'Allah et de Son pouvoir contre le mal de ce que je ressens et crains.",ref:"Muslim",context:"Poser la main sur la zone douloureuse et réciter 7 fois. Le Prophète ﷺ l'a enseigné à 'Uthman ibn Abi al-'As."}
+]},
+{cat:"🕌 Mosquée",items:[
+{title:"En entrant à la mosquée",ar:"اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ",fr:"Ô Allah, ouvre-moi les portes de Ta miséricorde.",ref:"Muslim",context:"Entrer du pied droit et réciter cette invocation. La mosquée est la maison d'Allah sur terre — lieu de miséricorde, de savoir et de prière."},
+{title:"En sortant de la mosquée",ar:"اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ",fr:"Ô Allah, je Te demande de Ta grâce.",ref:"Muslim",context:"Sortir du pied gauche. On demande la miséricorde en entrant et la grâce (rizq) en sortant — car le croyant sort pour chercher sa subsistance."},
+{title:"Entre l'adhan et l'iqama",ar:"الدُّعَاءُ لَا يُرَدُّ بَيْنَ الْأَذَانِ وَالْإِقَامَةِ",fr:"L'invocation n'est pas rejetée entre l'adhan et l'iqama.",ref:"Abu Dawud, At-Tirmidhi",context:"Le Prophète ﷺ a dit que c'est un moment privilégié où les du'a sont acceptées. Profite de ce moment pour faire tes demandes à Allah."}
+]},
+{cat:"🌧️ Détresse et souci",items:[
+{title:"Invocation de Yunus",ar:"لَا إِلَهَ إِلَّا أَنْتَ سُبْحَانَكَ إِنِّي كُنْتُ مِنَ الظَّالِمِينَ",fr:"Nulle divinité sauf Toi. Gloire à Toi, j'étais certes parmi les injustes.",ref:"At-Tirmidhi, Al-Anbiya 21:87",context:"L'invocation de Yunus dans le ventre du poisson. Le Prophète ﷺ a dit : « Aucun musulman n'invoque Allah avec cette du'a pour quoi que ce soit sans qu'Allah ne l'exauce. » [At-Tirmidhi, Sahîh]"},
+{title:"Contre le souci et la tristesse",ar:"اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ وَالْعَجْزِ وَالْكَسَلِ وَالْبُخْلِ وَالْجُبْنِ وَضَلَعِ الدَّيْنِ وَغَلَبَةِ الرِّجَالِ",fr:"Ô Allah, je cherche refuge auprès de Toi contre le souci, la tristesse, l'incapacité, la paresse, l'avarice, la lâcheté, le poids des dettes et la domination des hommes.",ref:"Bukhari",context:"Le Prophète ﷺ récitait souvent cette du'a complète. Elle couvre les 8 maux qui empêchent le croyant d'avancer dans sa vie et sa religion."},
+{title:"Quand une difficulté survient",ar:"إِنَّا لِلَّهِ وَإِنَّا إِلَيْهِ رَاجِعُونَ اللَّهُمَّ أْجُرْنِي فِي مُصِيبَتِي وَأَخْلِفْ لِي خَيْرًا مِنْهَا",fr:"Certes nous appartenons à Allah et vers Lui nous retournons. Ô Allah, récompense-moi dans mon épreuve et remplace-la par quelque chose de meilleur.",ref:"Muslim",context:"Umm Salama la récita à la mort de son mari Abu Salama. Allah la remplaça par le meilleur des maris : le Prophète Muhammad ﷺ. Preuve que cette du'a fonctionne."}
+]},
+{cat:"🏠 Maison",items:[
+{title:"En entrant chez soi",ar:"بِسْمِ اللهِ وَلَجْنَا وَبِسْمِ اللهِ خَرَجْنَا وَعَلَى رَبِّنَا تَوَكَّلْنَا",fr:"Au nom d'Allah nous entrons, au nom d'Allah nous sortons, et en Allah nous plaçons notre confiance.",ref:"Abu Dawud",context:"Le Prophète ﷺ a dit que quand on mentionne le nom d'Allah en entrant et en mangeant, le diable dit à ses compagnons : 'Vous n'avez ni gîte ni repas ici.'"},
+{title:"En sortant de chez soi",ar:"بِسْمِ اللهِ تَوَكَّلْتُ عَلَى اللهِ لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللهِ",fr:"Au nom d'Allah, je place ma confiance en Allah. Il n'y a de force ni de puissance qu'en Allah.",ref:"Abu Dawud, At-Tirmidhi",context:"Le Prophète ﷺ a dit : celui qui dit cela en sortant, il lui est dit 'Tu es guidé, protégé et préservé', et le diable s'éloigne de lui."}
+]},
+{cat:"☔ Intempéries",items:[
+{title:"Quand il pleut",ar:"اللَّهُمَّ صَيِّبًا نَافِعًا",fr:"Ô Allah, fais-en une pluie utile et bénéfique.",ref:"Bukhari",context:"La pluie est un signe de la miséricorde d'Allah. C'est un moment où les du'a sont acceptées."},
+{title:"Quand le vent souffle fort",ar:"اللَّهُمَّ إِنِّي أَسْأَلُكَ خَيْرَهَا وَأَعُوذُ بِكَ مِنْ شَرِّهَا",fr:"Ô Allah, je Te demande son bien et je cherche refuge auprès de Toi contre son mal.",ref:"Muslim",context:"Le Prophète ﷺ interdisait de maudire le vent car il est envoyé par Allah. Il peut porter la miséricorde ou le châtiment."}
+]}
+];
+const QUIZ_DATA={
+"Tawhîd":{
+debutant:[
+{q:"Combien de catégories de Tawhîd existe-t-il ?",opts:["1","2","3","4"],c:2,e:"3 catégories : Tawhîd ar-Rububiyyah (seigneurie), al-Uluhiyyah (adoration), al-Asma wa as-Sifat (noms et attributs)."},
+{q:"Que signifie 'Lâ ilâha illallâh' ?",opts:["Allah est grand","Nulle divinité ne mérite l'adoration sauf Allah","Allah est miséricordieux","Louange à Allah"],c:1,e:"C'est la négation de toute divinité (lâ ilâha) et l'affirmation qu'Allah seul mérite l'adoration (illallâh)."},
+{q:"Quel est le contraire du Tawhîd ?",opts:["Le Kufr","Le Shirk","La Bid'a","Le Fisq"],c:1,e:"Le Shirk est l'opposé direct du Tawhîd : c'est associer à Allah dans ce qui Lui est propre."},
+{q:"Quel livre de Cheikh Muhammad Ibn 'Abd al-Wahhâb traite du Tawhîd ?",opts:["Riyâdh as-Sâlihîn","Kitâb at-Tawhîd","Fath al-Bârî","Bulûgh al-Marâm"],c:1,e:"Kitâb at-Tawhîd est l'ouvrage fondamental pour comprendre le Tawhîd et ses violations."}
+],
+avance:[
+{q:"Quel type de Tawhîd les polythéistes de Quraysh reconnaissaient-ils ?",opts:["Al-Uluhiyyah","Ar-Rububiyyah","Al-Asma wa as-Sifat","Aucun"],c:1,e:"Ils reconnaissaient qu'Allah est le Créateur (Rububiyyah) mais adoraient les idoles à côté d'Allah, violant al-Uluhiyyah. [Al-Ankabut 29:63]"},
+{q:"Que signifie 'Tawhîd al-Asma wa as-Sifat' ?",opts:["Adorer Allah seul","Affirmer les noms et attributs d'Allah sans tahrîf, ta'tîl, tashbîh ni takyîf","Croire qu'Allah est le Créateur","Croire au destin"],c:1,e:"Affirmer ce qu'Allah a affirmé pour Lui-même sans altération (tahrîf), négation (ta'tîl), ressemblance (tashbîh) ni questionnement du 'comment' (takyîf)."}
+]},
+"Prophètes":{
+debutant:[
+{q:"Combien de prophètes sont nommés dans le Coran ?",opts:["10","20","25","50"],c:2,e:"25 prophètes sont nommés dans le Coran, mais il y en a eu beaucoup plus : 'Nous avons envoyé des messagers dont Nous t'avons raconté l'histoire et d'autres dont Nous ne t'avons pas raconté l'histoire' [An-Nisa 4:164]."},
+{q:"Qui est le premier prophète ?",opts:["Ibrahim","Nuh","Adam","Muhammad ﷺ"],c:2,e:"Adam ('alayhi salam) est le premier homme et le premier prophète."},
+{q:"Qui est le sceau des prophètes ?",opts:["'Isa","Musa","Ibrahim","Muhammad ﷺ"],c:3,e:"Muhammad ﷺ est Khâtam an-Nabiyyîn. [Al-Ahzab 33:40]"},
+{q:"Qui est Khalîlullâh (l'ami intime d'Allah) ?",opts:["Musa","Nuh","Ibrahim","Dawud"],c:2,e:"Ibrahim est Khalîlullâh. [An-Nisa 4:125]"},
+{q:"Quel prophète fut avalé par un poisson ?",opts:["Musa","Yunus","Nuh","'Isa"],c:1,e:"Yunus (Dhun-Nûn) fut avalé par un poisson et invoqua Allah dans les ténèbres. [Al-Anbiya 21:87]"},
+{q:"Qui construisit la Ka'ba ?",opts:["Muhammad ﷺ","Musa","Adam","Ibrahim et Isma'il"],c:3,e:"Ibrahim et Isma'il élevèrent les fondations de la Ka'ba. [Al-Baqarah 2:127]"}
+],
+avance:[
+{q:"Pendant combien d'années Nuh appela-t-il son peuple ?",opts:["100 ans","500 ans","950 ans","1000 ans"],c:2,e:"'Il demeura parmi eux mille ans moins cinquante' = 950 ans. [Al-Ankabut 29:14]"},
+{q:"Quelles sont les 5 idoles du peuple de Nuh ?",opts:["Lât, 'Uzza, Manât, Hubbal, Isâf","Wadd, Suwâ', Yaghûth, Ya'ûq, Nasr","Ba'l, Dâgon, Moloch, Ashtart, Tammûz","Aucune de ces réponses"],c:1,e:"Wadd, Suwâ', Yaghûth, Ya'ûq et Nasr — à l'origine les noms d'hommes pieux. [Nuh 71:23, Bukhari]"},
+{q:"À quel ciel le Prophète ﷺ rencontra-t-il Musa lors du Mi'raj ?",opts:["1er","4ème","6ème","7ème"],c:2,e:"Musa au 6ème ciel, Ibrahim au 7ème. [Bukhari & Muslim]"},
+{q:"Quel prophète est décrit comme 'Sâdiq al-Wa'd' (fidèle à ses promesses) ?",opts:["Ibrahim","Isma'il","Muhammad ﷺ","Yusuf"],c:1,e:"Isma'il est 'Sâdiq al-Wa'd'. [Maryam 19:54]"}
+]},
+"Fiqh":{
+debutant:[
+{q:"Combien de piliers a l'Islam ?",opts:["3","4","5","6"],c:2,e:"5 piliers : Shahada, Salat, Zakat, Siyam, Hajj. [Hadith de Jibril, Muslim]"},
+{q:"Combien de prières obligatoires par jour ?",opts:["3","4","5","7"],c:2,e:"Fajr, Dhuhr, 'Asr, Maghrib, 'Isha."},
+{q:"Quel est le pilier le plus important après la Shahada ?",opts:["Le jeûne","La prière","Le Hajj","La Zakat"],c:1,e:"La prière (Salat) est le pilier le plus important après la Shahada et le premier acte sur lequel le serviteur sera interrogé le Jour du Jugement."},
+{q:"Pendant quel mois le jeûne est-il obligatoire ?",opts:["Sha'ban","Muharram","Ramadan","Rajab"],c:2,e:"Le jeûne du Ramadan est le 4ème pilier de l'Islam. [Al-Baqarah 2:183]"}
+],
+avance:[
+{q:"Quelle est la position d'Ibn Taymiyya sur celui qui abandonne totalement la prière ?",opts:["C'est un pécheur","C'est un mécréant","C'est un hypocrite","Il n'y a pas de péché"],c:1,e:"Ibn Taymiyya considère que celui qui abandonne totalement la prière par négligence est mécréant, conformément au hadith : 'Entre l'homme et le kufr il y a l'abandon de la prière' [Muslim]."},
+{q:"Quel savant a écrit 'Sifat Salât an-Nabî' ?",opts:["Ibn Bâz","Al-Albani","Ibn Outhaymin","Al-Fawzan"],c:1,e:"Cheikh Al-Albani a écrit cet ouvrage de référence décrivant la prière du Prophète ﷺ selon les hadiths authentiques."}
+]},
+"Hadith":{
+debutant:[
+{q:"Quel est le recueil de hadiths le plus authentique ?",opts:["Sunan Abu Dawud","Sahîh Muslim","Sahîh al-Bukhari","Musnad Ahmad"],c:2,e:"Sahîh al-Bukhari est le livre le plus authentique après le Coran par consensus."},
+{q:"Qu'est-ce qu'un hadith 'Sahîh' ?",opts:["Un hadith inventé","Un hadith faible","Un hadith authentique","Un hadith annulé"],c:2,e:"Sahîh = authentique. Chaîne continue, rapporteurs fiables et précis, sans anomalie ni défaut caché."},
+{q:"Combien de hadiths contient le Sahîh al-Bukhari (sans répétitions) ?",opts:["~600","~2 600","~7 500","~30 000"],c:1,e:"Environ 2 602 hadiths sans répétitions (7 563 avec répétitions). Al-Bukhari les a sélectionnés parmi 600 000 hadiths qu'il connaissait."},
+{q:"Quel savant contemporain est la référence en authentification des hadiths ?",opts:["Ibn Bâz","Al-Fawzan","Al-Albani","Ibn Outhaymin"],c:2,e:"Cheikh Al-Albani (رحمه الله) est le plus grand muhaddith de l'époque contemporaine."}
+],
+avance:[
+{q:"Qu'est-ce qu'un hadith 'Mawdû'' ?",opts:["Faible","Bon","Inventé/Fabriqué","Suspendu"],c:2,e:"Mawdû' = inventé. C'est un mensonge attribué au Prophète ﷺ. Le rapporter en sachant qu'il est inventé est un péché grave."},
+{q:"Quelle est la différence entre un hadith Mutawâtir et Âhâd ?",opts:["Le nombre de rapporteurs","La longueur","Le sujet","L'époque"],c:0,e:"Mutawâtir : rapporté par tant de personnes à chaque niveau qu'il est impossible qu'ils se soient concertés pour mentir. Âhâd : rapporté par un nombre moindre."}
+]},
+"Aqida":{
+debutant:[
+{q:"Combien de piliers de la foi (Iman) ?",opts:["4","5","6","7"],c:2,e:"6 piliers : Allah, Ses anges, Ses livres, Ses messagers, le Jour dernier, le destin. [Hadith de Jibril, Muslim]"},
+{q:"Que signifie croire au Qadar ?",opts:["Croire au Paradis","Croire que tout est décrété par Allah","Croire aux anges","Croire aux prophètes"],c:1,e:"Croire que tout — le bien et le mal — a été décrété par Allah de toute éternité."},
+{q:"Combien d'annulatifs de l'Islam selon Cheikh Muhammad Ibn 'Abd al-Wahhâb ?",opts:["5","7","10","12"],c:2,e:"10 annulatifs (nawâqid) qui font sortir de l'Islam. Les connaître est obligatoire pour tout musulman."},
+{q:"Où est Allah ?",opts:["Partout","Au-dessus du Trône","Nulle part","Dans le cœur"],c:1,e:"Allah est au-dessus de Son Trône (al-'Arsh), au-dessus de Ses créatures, conformément au Coran et à la Sunnah. [Ta-Ha 20:5, Al-A'raf 7:54]"}
+],
+avance:[
+{q:"Que signifie 'Al-Walâ' wal-Barâ'' ?",opts:["La prière et le jeûne","L'alliance aux croyants et le désaveu du Shirk","Le mariage et le divorce","Le Hajj et la 'Umra"],c:1,e:"Al-Walâ' : aimer et s'allier aux croyants. Al-Barâ' : se désavouer du Shirk et de ses adeptes. Principe fondamental de la 'aqîda salafiste."},
+{q:"Les Ash'arites sont-ils sur la voie des Salaf ?",opts:["Oui","Non","Partiellement","C'est un ijtihad"],c:1,e:"Non, ils dévient de la voie des Salaf dans les noms et attributs d'Allah en utilisant le ta'wîl (interprétation allégorique). Les savants salafistes comme Ibn Taymiyya les ont réfutés."}
+]}
+};
+
+const FLASHCARD_DATA=[
+{front:"Tawhîd",back:"L'unicité d'Allah : Rububiyyah + Uluhiyyah + Asma wa Sifat"},
+{front:"Shirk",back:"Associer à Allah dans l'adoration. Plus grand péché."},
+{front:"Bid'a",back:"Innovation dans la religion. Toute bid'a est égarement. [Muslim]"},
+{front:"Manhaj",back:"Méthodologie de compréhension de l'Islam. Le manhaj salafi suit les 3 premières générations."},
+{front:"Sahîh",back:"Hadith authentique : chaîne continue + rapporteurs fiables + pas d'anomalie."},
+{front:"Hasan",back:"Hadith bon : chaîne acceptable mais rapporteur légèrement inférieur au Sahîh."},
+{front:"Da'if",back:"Hadith faible : défaut dans la chaîne. Non utilisable comme preuve."},
+{front:"Ijma'",back:"Consensus des savants musulmans sur une question."},
+{front:"Ijtihad",back:"Effort de réflexion d'un savant qualifié pour déduire une règle."},
+{front:"Tafsir",back:"Explication du Coran. Priorité : Coran par Coran, Sunnah, Compagnons, Tabi'in, langue arabe."},
+{front:"Takfir",back:"Déclarer quelqu'un mécréant. Conditions strictes obligatoires."},
+{front:"Tawbah",back:"Repentir : regretter + cesser + intention de ne pas recommencer."},
+{front:"Qadar",back:"Destin : 'Ilm (science) + Kitâba (écriture) + Mashî'a (volonté) + Khalq (création)."},
+{front:"Wala' wal-Bara'",back:"Alliance aux croyants + Désaveu du Shirk et de ses adeptes."},
+{front:"Khalîlullâh",back:"L'ami intime d'Allah = Ibrahim ('alayhi salam)."},
+{front:"Khâtam an-Nabiyyîn",back:"Le sceau des prophètes = Muhammad ﷺ. [Al-Ahzab 33:40]"},
+{front:"Ulul-'Azm",back:"Les 5 prophètes doués de fermeté : Nuh, Ibrahim, Musa, 'Isa, Muhammad ﷺ."},
+{front:"As-Sahîhayn",back:"Les deux Sahîh = Sahîh al-Bukhari + Sahîh Muslim."},
+{front:"An-Nawâqid al-'Ashra",back:"Les 10 annulatifs de l'Islam selon Muhammad Ibn 'Abd al-Wahhâb."},
+{front:"Al-Usûl ath-Thalâtha",back:"Les 3 Fondements : Connaître Allah, Sa religion, Son Prophète ﷺ."}
+];
+
+// Keep existing data from v7 that we're not changing
+const NAMES99=[
+{ar:"الرَّحْمَنُ",nom:"Ar-Rahman",fr:"Le Tout Miséricordieux"},{ar:"الرَّحِيمُ",nom:"Ar-Rahim",fr:"Le Très Miséricordieux"},{ar:"الْمَلِكُ",nom:"Al-Malik",fr:"Le Souverain"},{ar:"الْقُدُّوسُ",nom:"Al-Quddus",fr:"Le Saint"},{ar:"السَّلَامُ",nom:"As-Salam",fr:"La Paix"},{ar:"الْمُؤْمِنُ",nom:"Al-Mu'min",fr:"Le Fidèle"},{ar:"الْمُهَيْمِنُ",nom:"Al-Muhaymin",fr:"Le Protecteur"},{ar:"الْعَزِيزُ",nom:"Al-'Aziz",fr:"Le Tout Puissant"},{ar:"الْجَبَّارُ",nom:"Al-Jabbar",fr:"Le Contraignant"},{ar:"الْمُتَكَبِّرُ",nom:"Al-Mutakabbir",fr:"Le Superbe"},
+{ar:"الْخَالِقُ",nom:"Al-Khaliq",fr:"Le Créateur"},{ar:"الْبَارِئُ",nom:"Al-Bari'",fr:"Le Producteur"},{ar:"الْمُصَوِّرُ",nom:"Al-Musawwir",fr:"Le Façonneur"},{ar:"الْغَفَّارُ",nom:"Al-Ghaffar",fr:"Le Grand Pardonneur"},{ar:"الْقَهَّارُ",nom:"Al-Qahhar",fr:"Le Dominateur"},{ar:"الْوَهَّابُ",nom:"Al-Wahhab",fr:"Le Donateur"},{ar:"الرَّزَّاقُ",nom:"Ar-Razzaq",fr:"Le Pourvoyeur"},{ar:"الْفَتَّاحُ",nom:"Al-Fattah",fr:"Celui qui ouvre"},{ar:"الْعَلِيمُ",nom:"Al-'Alim",fr:"L'Omniscient"},{ar:"الْقَابِضُ",nom:"Al-Qabid",fr:"Celui qui retient"},
+{ar:"الْبَاسِطُ",nom:"Al-Basit",fr:"Celui qui étend"},{ar:"الْخَافِضُ",nom:"Al-Khafid",fr:"Celui qui abaisse"},{ar:"الرَّافِعُ",nom:"Ar-Rafi'",fr:"Celui qui élève"},{ar:"الْمُعِزُّ",nom:"Al-Mu'izz",fr:"Celui qui honore"},{ar:"الْمُذِلُّ",nom:"Al-Mudhill",fr:"Celui qui abaisse"},{ar:"السَّمِيعُ",nom:"As-Sami'",fr:"L'Audient"},{ar:"الْبَصِيرُ",nom:"Al-Basir",fr:"Le Clairvoyant"},{ar:"الْحَكَمُ",nom:"Al-Hakam",fr:"Le Juge"},{ar:"الْعَدْلُ",nom:"Al-'Adl",fr:"Le Juste"},{ar:"اللَّطِيفُ",nom:"Al-Latif",fr:"Le Subtil"},
+{ar:"الْخَبِيرُ",nom:"Al-Khabir",fr:"L'Informé"},{ar:"الْحَلِيمُ",nom:"Al-Halim",fr:"L'Indulgent"},{ar:"الْعَظِيمُ",nom:"Al-'Azim",fr:"Le Majestueux"},{ar:"الْغَفُورُ",nom:"Al-Ghafur",fr:"Le Pardonneur"},{ar:"الشَّكُورُ",nom:"Ash-Shakur",fr:"Le Reconnaissant"},{ar:"الْعَلِيُّ",nom:"Al-'Ali",fr:"Le Très Haut"},{ar:"الْكَبِيرُ",nom:"Al-Kabir",fr:"Le Grand"},{ar:"الْحَفِيظُ",nom:"Al-Hafiz",fr:"Le Préservateur"},{ar:"الْمُقِيتُ",nom:"Al-Muqit",fr:"Le Nourricier"},{ar:"الْحَسِيبُ",nom:"Al-Hasib",fr:"Celui qui tient compte"},
+{ar:"الْجَلِيلُ",nom:"Al-Jalil",fr:"Le Majestueux"},{ar:"الْكَرِيمُ",nom:"Al-Karim",fr:"Le Généreux"},{ar:"الرَّقِيبُ",nom:"Ar-Raqib",fr:"Le Vigilant"},{ar:"الْمُجِيبُ",nom:"Al-Mujib",fr:"Celui qui exauce"},{ar:"الْوَاسِعُ",nom:"Al-Wasi'",fr:"Le Vaste"},{ar:"الْحَكِيمُ",nom:"Al-Hakim",fr:"Le Sage"},{ar:"الْوَدُودُ",nom:"Al-Wadud",fr:"Le Bien-Aimant"},{ar:"الْمَجِيدُ",nom:"Al-Majid",fr:"Le Glorieux"},{ar:"الْبَاعِثُ",nom:"Al-Ba'ith",fr:"Celui qui ressuscite"},{ar:"الشَّهِيدُ",nom:"Ash-Shahid",fr:"Le Témoin"},
+{ar:"الْحَقُّ",nom:"Al-Haqq",fr:"La Vérité"},{ar:"الْوَكِيلُ",nom:"Al-Wakil",fr:"Le Garant"},{ar:"الْقَوِيُّ",nom:"Al-Qawi",fr:"Le Fort"},{ar:"الْمَتِينُ",nom:"Al-Matin",fr:"Le Ferme"},{ar:"الْوَلِيُّ",nom:"Al-Wali",fr:"L'Allié"},{ar:"الْحَمِيدُ",nom:"Al-Hamid",fr:"Le Louable"},{ar:"الْمُحْصِي",nom:"Al-Muhsi",fr:"Celui qui dénombre"},{ar:"الْمُبْدِئُ",nom:"Al-Mubdi'",fr:"Celui qui commence"},{ar:"الْمُعِيدُ",nom:"Al-Mu'id",fr:"Celui qui ramène"},{ar:"الْمُحْيِي",nom:"Al-Muhyi",fr:"Celui qui donne la vie"},
+{ar:"الْمُمِيتُ",nom:"Al-Mumit",fr:"Celui qui donne la mort"},{ar:"الْحَيُّ",nom:"Al-Hayy",fr:"Le Vivant"},{ar:"الْقَيُّومُ",nom:"Al-Qayyum",fr:"Le Subsistant"},{ar:"الْوَاجِدُ",nom:"Al-Wajid",fr:"Celui qui trouve"},{ar:"الْمَاجِدُ",nom:"Al-Majid2",fr:"Le Noble"},{ar:"الْوَاحِدُ",nom:"Al-Wahid",fr:"L'Unique"},{ar:"الصَّمَدُ",nom:"As-Samad",fr:"Le Seul recours"},{ar:"الْقَادِرُ",nom:"Al-Qadir",fr:"Le Capable"},{ar:"الْمُقْتَدِرُ",nom:"Al-Muqtadir",fr:"Le Tout-Puissant"},{ar:"الْمُقَدِّمُ",nom:"Al-Muqaddim",fr:"Celui qui avance"},
+{ar:"الْمُؤَخِّرُ",nom:"Al-Mu'akhkhir",fr:"Celui qui retarde"},{ar:"الْأَوَّلُ",nom:"Al-Awwal",fr:"Le Premier"},{ar:"الْآخِرُ",nom:"Al-Akhir",fr:"Le Dernier"},{ar:"الظَّاهِرُ",nom:"Az-Zahir",fr:"L'Apparent"},{ar:"الْبَاطِنُ",nom:"Al-Batin",fr:"Le Caché"},{ar:"الْوَالِي",nom:"Al-Wali2",fr:"Le Maître"},{ar:"الْمُتَعَالِي",nom:"Al-Muta'ali",fr:"Le Très Élevé"},{ar:"الْبَرُّ",nom:"Al-Barr",fr:"Le Bienfaiteur"},{ar:"التَّوَّابُ",nom:"At-Tawwab",fr:"Celui qui accepte le repentir"},{ar:"الْمُنْتَقِمُ",nom:"Al-Muntaqim",fr:"Le Vengeur"},
+{ar:"الْعَفُوُّ",nom:"Al-'Afuw",fr:"Celui qui efface"},{ar:"الرَّؤُوفُ",nom:"Ar-Ra'uf",fr:"Le Compatissant"},{ar:"مَالِكُ الْمُلْكِ",nom:"Malik al-Mulk",fr:"Possesseur du Royaume"},{ar:"ذُو الْجَلَالِ وَالْإِكْرَامِ",nom:"Dhul-Jalal wal-Ikram",fr:"Détenteur de Majesté et Générosité"},{ar:"الْمُقْسِطُ",nom:"Al-Muqsit",fr:"L'Équitable"},{ar:"الْجَامِعُ",nom:"Al-Jami'",fr:"Celui qui rassemble"},{ar:"الْغَنِيُّ",nom:"Al-Ghani",fr:"Le Riche"},{ar:"الْمُغْنِي",nom:"Al-Mughni",fr:"Celui qui enrichit"},{ar:"الْمَانِعُ",nom:"Al-Mani'",fr:"Celui qui empêche"},
+{ar:"الضَّارُّ",nom:"Ad-Darr",fr:"Celui qui peut nuire"},{ar:"النَّافِعُ",nom:"An-Nafi'",fr:"Celui qui profite"},{ar:"النُّورُ",nom:"An-Nur",fr:"La Lumière"},{ar:"الْهَادِي",nom:"Al-Hadi",fr:"Le Guide"},{ar:"الْبَدِيعُ",nom:"Al-Badi'",fr:"Le Créateur originel"},{ar:"الْبَاقِي",nom:"Al-Baqi",fr:"Le Permanent"},{ar:"الْوَارِثُ",nom:"Al-Warith",fr:"L'Héritier"},{ar:"الرَّشِيدُ",nom:"Ar-Rashid",fr:"Celui qui guide"},{ar:"الصَّبُورُ",nom:"As-Sabur",fr:"Le Patient"}
+];
+
+const SCHOLARS=[
+{name:"Imam Ahmad ibn Hanbal",ar:"أحمد بن حنبل",period:"780–855",cat:"Classique",specialty:"Tawhid, Attributs divins",works:"Al-Musnad, Ar-Radd 'ala al-Jahmiyyah",note:"Défenseur du Tawhid. Emprisonné pour avoir refusé la doctrine du Coran créé.",citation:"« Celui qui prétend que le Coran est créé est un jahmî mécréant. »"},
+{name:"Ibn Taymiyya",ar:"ابن تيمية",period:"1263–1328",cat:"Classique",specialty:"Réfutation des innovations",works:"Al-'Aqîda al-Wâsitiyya, Minhâj as-Sunnah",note:"Cheikh al-Islam. L'un des plus grands savants.",citation:"« Tout ce qui contredit le Coran et la Sunnah authentique est rejeté, quel que soit celui qui l'a dit. »"},
+{name:"Ibn Qayyim al-Jawziyya",ar:"ابن القيم",period:"1292–1350",cat:"Classique",specialty:"Purification de l'âme",works:"Madârij as-Sâlikîn, Zâd al-Ma'âd",note:"Élève d'Ibn Taymiyya. Expert en spiritualité.",citation:"« Le cœur ne trouve le repos qu'en se rapprochant d'Allah. »"},
+{name:"Muhammad Ibn 'Abd al-Wahhâb",ar:"محمد بن عبد الوهاب",period:"1703–1792",cat:"Réformateur",specialty:"Restauration du Tawhid",works:"Kitâb at-Tawhîd, Kashf ash-Shubuhât, Al-Usûl ath-Thalâtha",note:"Restaurateur du salafisme.",citation:"« Sache que le Tawhîd est le droit d'Allah sur Ses serviteurs. »"},
+{name:"Cheikh Al-Albani",ar:"الألباني",period:"1914–1999",cat:"Contemporain",specialty:"Hadith",works:"Silsilat al-Ahâdîth as-Sahîha, Sifat Salât an-Nabî",note:"Plus grand muhaddith contemporain.",citation:"« La vérité n'est pas connue par les hommes. Connais la vérité, tu connaîtras ses gens. »"},
+{name:"Cheikh Ibn Bâz",ar:"ابن باز",period:"1910–1999",cat:"Contemporain",specialty:"Fatwas, Da'wa",works:"Majmû' Fatâwâ",note:"Grand mufti d'Arabie Saoudite.",citation:"« La science la plus noble est la science du Tawhîd. »"},
+{name:"Cheikh Ibn Outhaymin",ar:"ابن عثيمين",period:"1925–2001",cat:"Contemporain",specialty:"Aqida, Fiqh, Pédagogie",works:"Sharh 'Aqîda Wâsitiyya, Al-Mumti'",note:"Pédagogue du manhaj salafiste.",citation:"« L'étudiant en science doit être patient et humble. »"},
+{name:"Cheikh Al-Fawzan",ar:"الفوزان",period:"1933–",cat:"Contemporain",specialty:"Droit, innovations",works:"Al-Muntaqa min Fatâwâ",note:"Membre du Comité des Grands Savants.",citation:"« La bid'a est plus aimée d'Iblîs que le péché, car on se repent du péché mais rarement de la bid'a. »"}
+];
+
+const VERSES=[
+{ar:"فَإِنَّ مَعَ الْعُسْرِ يُسْرًا",fr:"Car avec la difficulté il y a une facilité.",ref:"Ash-Sharh, 94:5"},
+{ar:"وَمَن يَتَوَكَّلْ عَلَى اللَّهِ فَهُوَ حَسْبُهُ",fr:"Quiconque place sa confiance en Allah, Il lui suffit.",ref:"At-Talaq, 65:3"},
+{ar:"إِنَّ اللَّهَ مَعَ الصَّابِرِينَ",fr:"Certes, Allah est avec les patients.",ref:"Al-Baqarah, 2:153"},
+{ar:"وَلَا تَيْأَسُوا مِن رَّوْحِ اللَّهِ",fr:"Ne désespérez pas de la miséricorde d'Allah.",ref:"Yusuf, 12:87"},
+{ar:"وَقُل رَّبِّ زِدْنِي عِلْمًا",fr:"Seigneur, accrois-moi en science.",ref:"Ta-Ha, 20:114"},
+{ar:"وَاصْبِرْ فَإِنَّ اللَّهَ لَا يُضِيعُ أَجْرَ الْمُحْسِنِينَ",fr:"Sois patient, Allah ne perd pas la récompense des bienfaisants.",ref:"Hud, 11:115"},
+{ar:"رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً",fr:"Seigneur, accorde-nous une belle part ici-bas et dans l'au-delà.",ref:"Al-Baqarah, 2:201"}
+];
+
+const CATEGORIES=["Général","Aqida","Fiqh","Hadiths","Tafsir","Akhlaq","Sira","Du'a"];
+
+const ISLAMIC_EVENTS=[
+{name:"1 Muharram — Nouvel An Hijri",desc:"Premier jour du calendrier islamique."},
+{name:"10 Muharram — 'Ashura",desc:"Jour de jeûne. Musa et son peuple sauvés. [Bukhari & Muslim]"},
+{name:"12 Rabi' al-Awwal — Naissance du Prophète ﷺ",desc:"Note : sa célébration est une bid'a selon les savants salafistes."},
+{name:"27 Rajab — Al-Isra wal-Mi'raj",desc:"Note : aucune célébration spécifique dans la Sunnah."},
+{name:"1 Ramadan — Début du Ramadan",desc:"Mois de jeûne et de la révélation du Coran."},
+{name:"Nuits impaires des 10 derniers jours",desc:"Laylat al-Qadr, meilleure que 1000 mois. [Al-Qadr 97:3]"},
+{name:"1 Shawwal — Aïd al-Fitr",desc:"Fête de la rupture. Zakat al-Fitr obligatoire."},
+{name:"9 Dhul Hijjah — Jour de 'Arafah",desc:"Jeûne recommandé, expie 2 années. [Muslim]"},
+{name:"10 Dhul Hijjah — Aïd al-Adha",desc:"Fête du sacrifice."}
+];
+
+const KHUTBA_THEMES=["Le Tawhîd","La patience","Le repentir","Les dangers du Shirk","L'importance de la prière","La sincérité","Les droits des parents","La fraternité","Les péchés de la langue","La mort et l'au-delà","La confiance en Allah","Les bienfaits du dhikr","Le bon comportement","L'amour d'Allah","Les signes de l'Heure","La science islamique"];
+
+const BOOKS=[
+{cat:"Tawhîd",items:[{title:"Kitâb at-Tawhîd",author:"Ibn 'Abd al-Wahhâb",level:"Débutant"},{title:"Kashf ash-Shubuhât",author:"Ibn 'Abd al-Wahhâb",level:"Débutant"},{title:"Sharh al-'Aqîda al-Wâsitiyya",author:"Ibn 'Uthaymin",level:"Intermédiaire"}]},
+{cat:"Hadith",items:[{title:"40 Hadiths d'An-Nawawi",author:"An-Nawawi",level:"Débutant"},{title:"Riyâdh as-Sâlihîn",author:"An-Nawawi",level:"Intermédiaire"},{title:"Sifat Salât an-Nabî",author:"Al-Albani",level:"Intermédiaire"}]},
+{cat:"Tafsir",items:[{title:"Taysîr al-Karîm ar-Rahmân",author:"As-Sa'di",level:"Avancé"},{title:"Tafsir Ibn Kathir",author:"Ibn Kathir",level:"Avancé"}]},
+{cat:"Fiqh",items:[{title:"Bulûgh al-Marâm",author:"Ibn Hajar",level:"Intermédiaire"},{title:"Fath al-Bârî",author:"Ibn Hajar",level:"Avancé"}]},
+{cat:"Purification",items:[{title:"Madârij as-Sâlikîn",author:"Ibn Qayyim",level:"Avancé"},{title:"Zâd al-Ma'âd",author:"Ibn Qayyim",level:"Avancé"}]}
+];
+
+const SYSTEM_PROMPT=`Tu es Souleyman (سُلَيْمَان), assistant bienveillant et érudit. Manhaj salafi. Sources : Coran, Sunnah Sahîh/Hasan (priorité Al-Albani), Ijma', savants salafistes. Structure : Bismillah → Introduction → Preuves → Conclusion avec « وَاللَّهُ أَعْلَمُ ». Respectueux, pédagogique. Harakât + translittération + traduction. Jamais sans preuve.
+BASE PERSONNALISÉE: {KB}
+PROFIL: {PROF}
+Réponds en français. Sois complet.`;
+
+// ===== STATE =====
+let S={apiKey:localStorage.getItem("s_key")||"",tab:"home",sub:null,subData:null,messages:[],loading:false,category:"Général",
+history:JSON.parse(localStorage.getItem("s_history")||"[]"),favorites:JSON.parse(localStorage.getItem("s_favs")||"[]"),
+kb:JSON.parse(localStorage.getItem("s_kb")||"[]"),profile:JSON.parse(localStorage.getItem("s_profile")||'{"name":"","level":"debutant"}'),
+theme:localStorage.getItem("s_theme")||"dark",fontSize:parseInt(localStorage.getItem("s_fontsize")||"14"),
+histSearch:"",modal:null,stats:JSON.parse(localStorage.getItem("s_stats")||'{"total":0}'),
+quizTheme:"",quizLevel:"",quizIdx:0,quizScore:0,quizAnswered:false,quizSelected:-1,quizStats:JSON.parse(localStorage.getItem("s_qstats")||"{}"),
+flashIdx:0,flashFlipped:false,names99Search:"",scholarFilter:"Tous",globalSearch:"",focusMode:false};
+function sv(k,v){localStorage.setItem(k,typeof v==="string"?v:JSON.stringify(v))}
+function getHijri(){const d=new Date(),jd=Math.floor(d.getTime()/86400000+2440587.5),l=jd-1948439+10632,n=Math.floor((l-1)/10631),l2=l-10631*n+354,j=Math.floor((10985-l2)/5316)*Math.floor(50*l2/17719)+Math.floor(l2/5670)*Math.floor(43*l2/15238),l3=l2-Math.floor((30-j)/15)*Math.floor(17719*j/50)-Math.floor(j/16)*Math.floor(15238*j/43)+29,m=Math.floor(24*l3/709),day=l3-Math.floor(709*m/24),y=30*n+j-30,ms=["Muharram","Safar","Rabi' al-Awwal","Rabi' al-Thani","Jumada al-Ula","Jumada al-Thania","Rajab","Sha'ban","Ramadan","Shawwal","Dhul Qi'dah","Dhul Hijjah"];return`${day} ${ms[m-1]} ${y} H`}
+function getVerse(){return VERSES[new Date().getDate()%VERSES.length]}
+function fmt(t){return t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>').split("\n").map(l=>{if(l.startsWith("### "))return`<h4>${l.slice(4)}</h4>`;if(l.startsWith("## "))return`<h3>${l.slice(3)}</h3>`;if(l.startsWith("# "))return`<h2>${l.slice(2)}</h2>`;if(l.startsWith("- "))return`<div style="padding-left:12px;margin:2px 0">• ${l.slice(2)}</div>`;if(/^\d+\.\s/.test(l))return`<div style="padding-left:12px;margin:2px 0">${l}</div>`;if(!l.trim())return"<br/>";return`<div style="margin:2px 0">${l}</div>`}).join("")}
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\n/g,"<br>")}
+
+// ===== RENDER =====
+function R(){
+document.documentElement.setAttribute("data-theme",S.theme);document.body.style.fontSize=S.fontSize+"px";
+if(!S.apiKey){app.innerHTML=`<div class="setup"><div class="setup-av">🕌</div><div class="setup-t">سُلَيْمَان</div><div class="setup-d">Clé API <strong>Google Gemini</strong> gratuite requise.</div><div class="setup-steps"><strong>3 étapes :</strong><br>1️⃣ <strong>aistudio.google.com</strong><br>2️⃣ Connecte-toi avec Google<br>3️⃣ <strong>Get API key → Create</strong></div><input class="setup-inp" id="skey" type="password" placeholder="AIzaSy..."/><div id="serr" style="color:#e74c3c;font-size:13px;display:none"></div><button class="setup-btn" onclick="saveKey()">Démarrer ✦</button><a class="setup-link" href="https://aistudio.google.com/apikey" target="_blank">→ Obtenir clé gratuite</a></div>`;return}
+if(S.sub){app.innerHTML=renderSub()+nav();return}
+const tabs=["home","chat","biblio","more"];
+app.innerHTML=tabs.map(t=>`<div class="page" style="display:${S.tab===t?'flex':'none'}">${S.tab===t?rTab(t):''}</div>`).join("")+(S.focusMode?'':nav())+(S.modal?rModal():'');
+if(S.tab==='chat')initChat();
+}
+
+function nav(){return`<nav class="nav">
+<button class="nav-btn ${S.tab==='home'?'active':''}" onclick="go('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg><span>Accueil</span></button>
+<button class="nav-btn ${S.tab==='chat'?'active':''}" onclick="go('chat')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg><span>Chat</span></button>
+<button class="nav-btn ${S.tab==='biblio'?'active':''}" onclick="go('biblio')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg><span>Biblio</span></button>
+<button class="nav-btn ${S.tab==='more'?'active':''}" onclick="go('more')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg><span>Plus</span></button>
+</nav>`}
+
+function rTab(t){switch(t){case'home':return rHome();case'chat':return rChat();case'biblio':return rBiblio();case'more':return rMore();default:return''}}
+
+function rHome(){const v=getVerse(),g=S.profile.name?`Bismillah, ${S.profile.name}`:'بِسْمِ اللهِ الرَّحْمَنِ الرَّحِيمِ';
+return`<div class="hdr"><div><div class="hdr-title">سُلَيْمَان</div><div class="hdr-sub">Accueil</div></div></div><div style="padding-bottom:20px">
+<div class="card" style="text-align:center"><div style="font-size:14px;color:var(--text2)">As-salâmu 'alaykum</div><div style="font-size:18px;color:var(--gold);margin:6px 0">${g}</div><div style="font-size:20px;color:var(--gold)">${getHijri()}</div><div style="font-size:11px;color:var(--text2);margin-top:4px">${new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div></div>
+<div class="card"><div class="card-title">✦ VERSET DU JOUR</div><div style="text-align:right;font-size:19px;color:var(--gold);line-height:2;margin-bottom:6px">${v.ar}</div><div style="font-style:italic;line-height:1.6;font-size:13px;border-left:3px solid var(--gold);padding-left:10px">${v.fr}<div style="font-size:10px;color:var(--gold-dim);margin-top:4px">[${v.ref}]</div></div></div>
+<div class="stitle">ACCÈS RAPIDE</div>
+<div class="grid2">
+<button class="grid-btn" onclick="go('chat')"><span class="icon">💬</span>Souleyman</button>
+<button class="grid-btn" onclick="openSub('quiz-select')"><span class="icon">🧠</span>Quiz</button>
+<button class="grid-btn" onclick="openSub('prophets')"><span class="icon">📜</span>Prophètes</button>
+<button class="grid-btn" onclick="openSub('search')"><span class="icon">🔍</span>Rechercher</button>
+<button class="grid-btn" onclick="quickChat('Donne-moi une invocation pour cette journée')"><span class="icon">🤲</span>Du'a du jour</button>
+<button class="grid-btn" onclick="openSub('flashcards')"><span class="icon">🎴</span>Flashcards</button>
+</div></div>`}
+
+function rChat(){return`<div class="hdr"><div><div class="hdr-title">سُلَيْمَان</div><div class="hdr-sub">Chat</div></div><div style="display:flex;gap:6px">${S.focusMode?'<button class="hdr-btn" onclick="S.focusMode=false;R()">✕</button>':''}<button class="hdr-btn" onclick="compareScholars()">⚖️</button><button class="hdr-btn" onclick="newChat()">✦</button></div></div>
+<div class="cat-bar">${CATEGORIES.map(c=>`<button class="cat-btn ${S.category===c?'active':''}" onclick="S.category='${c}';R()">${c}</button>`).join("")}</div>
+<div class="msgs" id="msgs">${S.messages.length===0?`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:14px;padding:20px;text-align:center"><div style="font-size:24px;color:var(--gold)">بِسْمِ اللهِ</div><div style="font-size:12px;color:var(--text2);max-width:280px;line-height:1.5">Catégorie : <strong style="color:var(--gold)">${S.category}</strong><br><br>💡 "rentre dans ta base de données : [info]"</div></div>`:rMsgs()}</div>
+<div class="input-area"><div class="input-row"><textarea id="ci" placeholder="Pose ta question..." rows="1"></textarea><button class="send-btn" ${S.loading?'disabled':''} onclick="sendMsg()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button></div></div>`}
+
+function rMsgs(){let h=S.messages.map((m,i)=>m.role==="user"?`<div class="msg-row user"><div class="bubble user">${esc(m.content)}</div></div>`:`<div class="msg-row"><div class="sm-av">🕌</div><div class="bubble ai">${fmt(m.content)}<div style="display:flex;gap:4px;margin-top:6px"><button class="msg-act" onclick="navigator.clipboard?.writeText(S.messages[${i}].content)">📋</button><button class="msg-act ${S.favorites.some(f=>f.a===m.content)?'faved':''}" onclick="favMsg(${i})">⭐</button><button class="msg-act" onclick="editMsg(${i})">✏️</button></div></div></div>`).join("");
+if(S.loading)h+=`<div class="msg-row"><div class="sm-av">🕌</div><div class="loading-b"><span style="animation:pulse 1.2s infinite">✦</span> Souleyman réfléchit<span id="dots"></span></div></div>`;
+return h}
+
+function initChat(){const ta=document.getElementById("ci");if(ta){ta.addEventListener("input",()=>{ta.style.height="auto";ta.style.height=Math.min(ta.scrollHeight,100)+"px"});ta.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMsg()}});if(!S.loading)ta.focus()}const m=document.getElementById("msgs");if(m)m.scrollTop=m.scrollHeight;if(S.loading)setTimeout(()=>{const el=document.getElementById("dots");if(!el)return;let c=0;clearInterval(window._di);window._di=setInterval(()=>{c=(c+1)%4;el.textContent=".".repeat(c)},400)},50)}
+
+function rBiblio(){return`<div class="hdr"><div><div class="hdr-title">المكتبة</div><div class="hdr-sub">Bibliothèque</div></div></div><div style="padding-bottom:20px">
+<div class="stitle">📖 HISTOIRES & PERSONNAGES</div>
+<div class="grid2">
+<button class="grid-btn" onclick="openSub('prophets')"><span class="icon">📜</span>25 Prophètes</button>
+<button class="grid-btn" onclick="openSub('tree')"><span class="icon">🌳</span>Arbre des prophètes</button>
+<button class="grid-btn" onclick="openSub('companions')"><span class="icon">⭐</span>10 Compagnons</button>
+<button class="grid-btn" onclick="openSub('women')"><span class="icon">👩</span>Femmes illustres</button>
+<button class="grid-btn" onclick="openSub('battles')"><span class="icon">⚔️</span>Batailles</button>
+<button class="grid-btn" onclick="openSub('quran-stories')"><span class="icon">📕</span>Histoires du Coran</button>
+</div>
+<div class="stitle">🕌 AQIDA & CONNAISSANCE</div>
+<div class="grid2">
+<button class="grid-btn" onclick="openSub('names99')"><span class="icon">✨</span>99 Noms d'Allah</button>
+<button class="grid-btn" onclick="openSub('glossary')"><span class="icon">📚</span>Glossaire</button>
+<button class="grid-btn" onclick="openSub('sins')"><span class="icon">⚠️</span>7 Péchés majeurs</button>
+<button class="grid-btn" onclick="openSub('nawaqid')"><span class="icon">🚫</span>10 Annulatifs</button>
+<button class="grid-btn" onclick="openSub('miracles')"><span class="icon">🌟</span>Miracles du Coran</button>
+<button class="grid-btn" onclick="openSub('scholars')"><span class="icon">🧑‍🏫</span>Savants</button>
+</div>
+<div class="stitle">🎯 APPRENTISSAGE</div>
+<div class="grid2">
+<button class="grid-btn" onclick="openSub('quiz-select')"><span class="icon">🧠</span>Quiz</button>
+<button class="grid-btn" onclick="openSub('flashcards')"><span class="icon">🎴</span>Flashcards</button>
+<button class="grid-btn" onclick="openSub('duas')"><span class="icon">🤲</span>Du'a</button>
+<button class="grid-btn" onclick="openSub('books')"><span class="icon">📕</span>Livres</button>
+</div></div>`}
+
+function rMore(){return`<div class="hdr"><div><div class="hdr-title">Plus</div><div class="hdr-sub">Options</div></div></div><div style="flex:1;overflow-y:auto;padding-bottom:20px">
+<div class="stitle">🔧 OUTILS</div>
+<div class="li" onclick="openSub('search')"><div class="li-t">🔍 Recherche globale</div><div class="li-s">Chercher dans tout le contenu</div></div>
+<div class="li" onclick="openSub('calendar')"><div class="li-t">📅 Calendrier islamique</div><div class="li-s">Événements de l'année</div></div>
+<div class="li" onclick="openSub('khutba')"><div class="li-t">🎤 Générateur de Khutba</div><div class="li-s">Rappel islamique sur un thème</div></div>
+<div class="li" onclick="openSub('quiz-stats')"><div class="li-t">📊 Statistiques Quiz</div><div class="li-s">Taux de réussite par thème</div></div>
+<div class="li" onclick="S.focusMode=true;S.tab='chat';S.sub=null;R()"><div class="li-t">🎯 Mode concentré</div><div class="li-s">Juste le chat</div></div>
+<div class="stitle">📋 GESTION</div>
+<div class="li" onclick="openSub('history')"><div class="li-t">📜 Historique (${S.history.length})</div></div>
+<div class="li" onclick="openSub('favs')"><div class="li-t">⭐ Favoris (${S.favorites.length})</div></div>
+<div class="li" onclick="openSub('settings')"><div class="li-t">⚙️ Réglages</div></div>
+</div>`}
+
+// ===== SUB PAGES =====
+function subH(t,s){return`<div class="hdr"><button class="hdr-back" onclick="goBack()">←</button><div><div class="hdr-title">${t}</div>${s?`<div class="hdr-sub">${s}</div>`:''}</div><div></div></div>`}
+
+function renderSub(){switch(S.sub){
+case'prophets':return subH('الأنبياء','25 Prophètes')+`<div style="flex:1;overflow-y:auto">${PROPHETS.map((p,i)=>`<div class="li" onclick="openSub('prophet-d',${i})"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:22px">${p.icon}</span><div><div class="li-t">${p.name}</div><div class="li-s">${p.summary.slice(0,70)}...</div></div></div></div>`).join("")}</div>`;
+case'prophet-d':const p=PROPHETS[S.subData];return subH(p.name,'')+`<div class="det" style="flex:1;overflow-y:auto"><div style="text-align:center;font-size:42px;margin:8px 0">${p.icon}</div><div class="det-s"><div class="det-l">📖 Histoire</div><div style="white-space:pre-line;line-height:1.8">${p.summary}</div></div><div class="det-s"><div class="det-l">📑 Références</div>${p.verses}</div><div class="det-s"><div class="det-l">💡 Leçons</div><div style="white-space:pre-line">${p.lecon}</div></div><button class="grid-btn" style="width:100%;margin-top:10px" onclick="quickChat('Raconte-moi tout sur ${p.name.replace(/'/g,"\\'")}')">💬 Demander à Souleyman</button></div>`;
+case'tree':return subH('🌳','Lignée des Prophètes')+`<div style="flex:1;overflow-y:auto;padding:16px">${PROPHET_TREE.map(t=>`<div style="margin-left:${t.gen*16}px;padding:6px 0;font-size:13px;${t.text.includes('—')?'border-left:2px solid var(--gold-dim);padding-left:10px':''}">${t.text.includes('Ibrahim')||t.text.includes('Muhammad')||t.text.includes('Adam')||t.text.includes('Nuh')?`<strong style="color:var(--gold)">${t.text}</strong>`:t.text}</div>`).join("")}</div>`;
+case'companions':return subH('الصحابة','10 Compagnons')+`<div style="flex:1;overflow-y:auto">${COMPANIONS.map(c=>`<div class="card"><div style="font-weight:700;font-size:15px;color:var(--gold)">${c.name}</div><div style="font-size:18px;text-align:right;color:var(--gold-dim);margin:4px 0">${c.ar}</div><div style="font-size:13px;line-height:1.7;white-space:pre-line">${c.bio}</div></div>`).join("")}</div>`;
+case'women':return subH('النساء','Femmes illustres')+`<div style="flex:1;overflow-y:auto">${WOMEN.map(w=>`<div class="card"><div style="font-weight:700;font-size:15px;color:var(--gold)">${w.name}</div><div style="font-size:16px;text-align:right;color:var(--gold-dim);margin:4px 0">${w.ar}</div><div style="font-size:13px;line-height:1.7;white-space:pre-line">${w.bio}</div></div>`).join("")}</div>`;
+case'battles':return subH('المعارك','Batailles')+`<div style="flex:1;overflow-y:auto">${BATTLES.map(b=>`<div class="card"><div style="font-weight:700;font-size:15px;color:var(--gold)">${b.name}</div><div style="font-size:11px;color:var(--gold-dim);margin:2px 0">${b.date}</div><div style="font-size:13px;line-height:1.7;white-space:pre-line;margin-top:6px">${b.desc}</div><div style="font-size:10px;color:var(--gold-dim);margin-top:6px">${b.ref}</div></div>`).join("")}</div>`;
+case'quran-stories':return subH('قصص','Histoires du Coran')+`<div style="flex:1;overflow-y:auto">${QURAN_STORIES.map(s=>`<div class="card"><div style="font-weight:700;font-size:15px;color:var(--gold)">${s.name}</div><div style="font-size:13px;line-height:1.7;margin-top:6px;white-space:pre-line">${s.summary}</div><div style="font-size:10px;color:var(--gold-dim);margin-top:6px">${s.ref}</div></div>`).join("")}</div>`;
+case'names99':return subH('أسماء الله','99 Noms')+`<input class="search-input" placeholder="🔍 Rechercher..." value="${S.names99Search}" oninput="S.names99Search=this.value;R()"/><div style="flex:1;overflow-y:auto">${(S.names99Search?NAMES99.filter(n=>n.nom.toLowerCase().includes(S.names99Search.toLowerCase())||n.fr.toLowerCase().includes(S.names99Search.toLowerCase())):NAMES99).map((n,i)=>`<div class="li" style="display:flex;justify-content:space-between"><div><span style="color:var(--gold);font-weight:700;margin-right:6px">${NAMES99.indexOf(n)+1}.</span><strong>${n.nom}</strong> — ${n.fr}</div><div style="font-size:22px;color:var(--gold)">${n.ar}</div></div>`).join("")}</div>`;
+case'glossary':return subH('المعجم','Glossaire')+`<div style="flex:1;overflow-y:auto">${GLOSSARY.map(g=>`<div class="card"><div style="font-weight:700;color:var(--gold);font-size:15px;margin-bottom:6px">${g.term}</div><div style="font-size:13px;line-height:1.7;white-space:pre-line">${g.def}</div></div>`).join("")}</div>`;
+case'sins':return subH('الكبائر','7 Péchés majeurs')+`<div style="flex:1;overflow-y:auto">${MAJOR_SINS.map((s,i)=>`<div class="card"><div style="font-weight:700;color:var(--gold);font-size:15px">${i+1}. ${s.name}</div><div style="font-size:13px;line-height:1.7;margin-top:6px;white-space:pre-line">${s.desc}</div><div style="font-size:10px;color:var(--gold-dim);margin-top:4px">${s.ref}</div></div>`).join("")}</div>`;
+case'nawaqid':return subH('النواقض','Annulatifs de l\'Islam')+`<div style="flex:1;overflow-y:auto"><div class="card"><div class="card-title">Source : Cheikh Muhammad Ibn 'Abd al-Wahhâb</div></div>${NAWAQID.map(n=>`<div class="card"><div style="font-weight:700;color:var(--gold);font-size:14px">${n.name}</div><div style="font-size:13px;line-height:1.7;margin-top:6px;white-space:pre-line">${n.desc}</div></div>`).join("")}</div>`;
+case'miracles':return subH('إعجاز','Miracles du Coran')+`<div style="flex:1;overflow-y:auto">${MIRACLES.map(m=>`<div class="card"><div style="font-weight:700;color:var(--gold);font-size:15px">${m.name}</div><div style="font-size:13px;line-height:1.7;margin-top:6px;white-space:pre-line">${m.desc}</div><div style="font-size:10px;color:var(--gold-dim);margin-top:4px">${m.ref}</div></div>`).join("")}</div>`;
+case'scholars':const cats=["Tous","Classique","Réformateur","Contemporain"];const filt=S.scholarFilter==="Tous"?SCHOLARS:SCHOLARS.filter(s=>s.cat===S.scholarFilter);return subH('العلماء','Savants')+`<div class="cat-bar">${cats.map(c=>`<button class="cat-btn ${S.scholarFilter===c?'active':''}" onclick="S.scholarFilter='${c}';R()">${c}</button>`).join("")}</div><div style="flex:1;overflow-y:auto">${filt.map(s=>`<div class="card"><div style="font-weight:700;font-size:15px;color:var(--gold)">${s.name} <span style="font-size:18px">${s.ar}</span></div><div style="font-size:11px;color:var(--text2);margin:2px 0">${s.period} • ${s.cat} • ${s.specialty}</div><div style="font-size:13px;margin-top:6px"><strong>Œuvres :</strong> ${s.works}</div><div style="font-size:12px;margin-top:4px;color:var(--text2)">${s.note}</div>${s.citation?`<div style="font-size:13px;margin-top:8px;padding:8px;border-left:3px solid var(--gold);font-style:italic">« ${s.citation} »</div>`:''}</div>`).join("")}</div>`;
+case'duas':return subH('الدُّعَاء','Du\'a')+`<div style="flex:1;overflow-y:auto">${DUAS.map((d,i)=>`<div class="li" onclick="openSub('dua-cat',${i})"><div class="li-t">${d.cat}</div><div class="li-s">${d.items.length} invocations</div></div>`).join("")}</div>`;
+case'dua-cat':const d=DUAS[S.subData];return subH(d.cat,'')+`<div style="flex:1;overflow-y:auto">${d.items.map(i=>`<div class="card"><div style="font-weight:700;margin-bottom:6px">${i.title}</div><div style="font-size:17px;color:var(--gold);text-align:right;line-height:2">${i.ar}</div><div style="font-size:13px;margin:6px 0;line-height:1.6">${i.fr}</div>${i.context?`<div style="font-size:12px;color:var(--text2);margin:6px 0;padding:8px;background:var(--bg);border-radius:8px;line-height:1.5">📝 ${i.context}</div>`:''}<div style="font-size:10px;color:var(--gold-dim)">Source : ${i.ref}</div></div>`).join("")}</div>`;
+case'books':return subH('📕','Livres')+`<div style="flex:1;overflow-y:auto">${BOOKS.map(b=>`<div class="stitle">${b.cat}</div>${b.items.map(i=>`<div class="card"><div style="font-weight:700">${i.title}</div><div style="font-size:12px;color:var(--text2)">✍️ ${i.author} • ${i.level}</div></div>`).join("")}`).join("")}</div>`;
+
+// QUIZ
+case'quiz-select':const themes=Object.keys(QUIZ_DATA);return subH('🧠','Quiz')+`<div style="flex:1;overflow-y:auto;padding:16px"><div style="text-align:center;font-size:36px;margin-bottom:10px">🧠</div><div style="text-align:center;font-size:16px;color:var(--gold);font-weight:700;margin-bottom:16px">Choisis un thème et un niveau</div>${themes.map(t=>`<div class="card" style="cursor:pointer"><div style="font-weight:700;color:var(--gold);margin-bottom:8px">${t}</div><div style="display:flex;gap:8px">${QUIZ_DATA[t].debutant?`<button class="hdr-btn" onclick="startQuiz('${t}','debutant')">Débutant (${QUIZ_DATA[t].debutant.length})</button>`:''} ${QUIZ_DATA[t].avance?`<button class="hdr-btn" onclick="startQuiz('${t}','avance')">Avancé (${QUIZ_DATA[t].avance.length})</button>`:''}</div></div>`).join("")}</div>`;
+case'quiz':const qList=QUIZ_DATA[S.quizTheme]?.[S.quizLevel]||[];if(S.quizIdx>=qList.length){const key=S.quizTheme+"_"+S.quizLevel;S.quizStats[key]={score:S.quizScore,total:qList.length,date:new Date().toLocaleDateString('fr-FR')};sv("s_qstats",S.quizStats);return subH('🧠','Résultat')+`<div style="flex:1;overflow-y:auto;padding:20px;text-align:center"><div style="font-size:48px">${S.quizScore>=qList.length*0.8?'🥇':S.quizScore>=qList.length*0.5?'🥈':'🥉'}</div><div style="font-size:24px;color:var(--gold);font-weight:700;margin:10px 0">${S.quizScore}/${qList.length}</div><div style="font-size:14px;color:var(--text2)">${S.quizTheme} — ${S.quizLevel}</div><div style="display:flex;gap:8px;justify-content:center;margin-top:16px"><button class="grid-btn" style="width:130px" onclick="startQuiz('${S.quizTheme}','${S.quizLevel}')">🔄 Refaire</button><button class="grid-btn" style="width:130px" onclick="openSub('quiz-select')">← Thèmes</button></div></div>`}
+const q=qList[S.quizIdx],pct=Math.round(S.quizIdx/qList.length*100);return subH(S.quizTheme,S.quizLevel)+`<div class="qprog"><span>${S.quizIdx+1}/${qList.length}</span><div class="qbar"><div class="qfill" style="width:${pct}%"></div></div><span>${S.quizScore}pts</span></div><div style="padding:20px 16px"><div class="quiz-q">${q.q}</div>${q.opts.map((o,i)=>{let cls="quiz-opt";if(S.quizAnswered){if(i===q.c)cls+=" correct";else if(i===S.quizSelected&&i!==q.c)cls+=" wrong"}return`<button class="${cls}" onclick="ansQuiz(${i})" ${S.quizAnswered?'disabled':''}>${o}</button>`}).join("")}${S.quizAnswered?`<div class="quiz-expl">${q.e}</div><button class="grid-btn" style="width:100%;margin-top:10px" onclick="nextQuiz()">Suivant →</button>`:''}</div>`;
+
+case'quiz-stats':return subH('📊','Stats Quiz')+`<div style="flex:1;overflow-y:auto">${Object.keys(S.quizStats).length===0?'<div style="padding:40px;text-align:center;color:var(--text2)">Aucun quiz terminé</div>':Object.entries(S.quizStats).map(([k,v])=>`<div class="card"><div style="font-weight:700;color:var(--gold)">${k.replace('_',' — ')}</div><div style="font-size:20px;color:var(--gold);font-weight:700;margin:6px 0">${v.score}/${v.total} (${Math.round(v.score/v.total*100)}%)</div><div style="font-size:11px;color:var(--text2)">${v.date}</div></div>`).join("")}</div>`;
+
+case'flashcards':return subH('🎴','Flashcards')+`<div style="flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px"><div style="font-size:12px;color:var(--text2);margin-bottom:8px">${S.flashIdx+1} / ${FLASHCARD_DATA.length}</div><div class="flash" onclick="S.flashFlipped=!S.flashFlipped;R()" style="width:100%;max-width:340px;${S.flashFlipped?'background:var(--user-bg);border-color:var(--gold-dim)':''}"><div>${S.flashFlipped?`<div style="font-size:13px;color:var(--text2);margin-bottom:6px">Réponse :</div><div style="color:var(--gold)">${FLASHCARD_DATA[S.flashIdx].back}</div>`:`<div style="color:var(--gold);font-weight:700">${FLASHCARD_DATA[S.flashIdx].front}</div><div style="font-size:11px;color:var(--text2);margin-top:8px">Touche pour retourner</div>`}</div></div><div style="display:flex;gap:10px;margin-top:16px"><button class="grid-btn" style="width:100px" onclick="S.flashIdx=Math.max(0,S.flashIdx-1);S.flashFlipped=false;R()">← Préc.</button><button class="grid-btn" style="width:100px" onclick="S.flashIdx=Math.min(FLASHCARD_DATA.length-1,S.flashIdx+1);S.flashFlipped=false;R()">Suiv. →</button></div><button class="hdr-btn" style="margin-top:12px" onclick="S.flashIdx=Math.floor(Math.random()*FLASHCARD_DATA.length);S.flashFlipped=false;R()">🎲 Aléatoire</button></div>`;
+
+case'search':return subH('🔍','Recherche globale')+`<input class="search-input" placeholder="Chercher dans tout..." value="${S.globalSearch}" oninput="S.globalSearch=this.value;R()"/><div style="flex:1;overflow-y:auto">${S.globalSearch.length<2?'<div style="padding:30px;text-align:center;color:var(--text2)">Tape au moins 2 caractères</div>':renderSearchResults()}</div>`;
+
+case'calendar':return subH('📅','Calendrier')+`<div style="flex:1;overflow-y:auto"><div class="card" style="text-align:center"><div style="font-size:20px;color:var(--gold)">${getHijri()}</div></div>${ISLAMIC_EVENTS.map(e=>`<div class="card"><div style="font-weight:700;color:var(--gold)">${e.name}</div><div style="font-size:13px;margin-top:4px;line-height:1.6">${e.desc}</div></div>`).join("")}</div>`;
+
+case'khutba':return subH('🎤','Khutba')+`<div style="flex:1;overflow-y:auto"><div class="card" style="text-align:center"><div style="font-size:36px">🎤</div><div style="font-size:16px;color:var(--gold);font-weight:700;margin-top:6px">Générateur de Rappel</div></div><div class="stitle">THÈMES</div>${KHUTBA_THEMES.map(t=>`<div class="li" onclick="genKhutba('${t.replace(/'/g,"\\'")}')"><div class="li-t">📝 ${t}</div></div>`).join("")}<div class="card"><div style="font-weight:700;margin-bottom:6px">✍️ Thème libre</div><input class="sett-input" style="width:100%" id="ck" placeholder="Ex: La patience"/><button class="grid-btn" style="width:100%;margin-top:8px" onclick="const v=document.getElementById('ck')?.value;if(v)genKhutba(v)">Générer</button></div></div>`;
+
+case'history':const hf=S.histSearch?S.history.filter(h=>h.preview.toLowerCase().includes(S.histSearch.toLowerCase())):S.history;return subH('Historique','')+`<input class="search-input" placeholder="🔍 Rechercher..." value="${S.histSearch}" oninput="S.histSearch=this.value;R()"/><div style="flex:1;overflow-y:auto">${hf.length===0?'<div style="padding:40px;text-align:center;color:var(--text2)">Vide</div>':hf.map((h,i)=>`<div class="li" onclick="S.messages=S.history[${i}].messages;S.tab='chat';S.sub=null;R()"><div style="font-size:10px;color:var(--text2);font-family:var(--mono)">${h.date}</div><div style="font-size:13px;margin-top:3px">${esc(h.preview).slice(0,60)}</div></div>`).join("")}</div>`;
+case'favs':return subH('⭐','Favoris')+`<div style="flex:1;overflow-y:auto">${S.favorites.length===0?'<div style="padding:40px;text-align:center;color:var(--text2)">Aucun</div>':S.favorites.map((f,i)=>`<div class="card" style="position:relative"><div style="font-size:11px;color:var(--text2)">Q: ${esc(f.q).slice(0,80)}</div><div style="font-size:13px;margin-top:6px;line-height:1.6">${esc(f.a).slice(0,200)}...</div><button onclick="S.favorites.splice(${i},1);sv('s_favs',S.favorites);R()" style="position:absolute;top:8px;right:8px;background:none;border:none;color:#e74c3c;cursor:pointer">✕</button></div>`).join("")}</div>`;
+case'settings':return subH('⚙️','Réglages')+`<div style="flex:1;overflow-y:auto">
+<div class="sett-group"><div class="sett-label">👤 Profil</div><div class="sett-row"><span class="sett-name">Prénom</span><input class="sett-input" value="${S.profile.name}" onchange="S.profile.name=this.value;sv('s_profile',S.profile)" placeholder="Ton prénom"/></div><div class="sett-row"><span class="sett-name">Niveau</span><select class="sett-select" onchange="S.profile.level=this.value;sv('s_profile',S.profile)"><option value="debutant" ${S.profile.level==='debutant'?'selected':''}>Débutant</option><option value="intermediaire" ${S.profile.level==='intermediaire'?'selected':''}>Intermédiaire</option><option value="avance" ${S.profile.level==='avance'?'selected':''}>Avancé</option></select></div></div>
+<div class="sett-group"><div class="sett-label">🎨 Apparence</div><div class="sett-row"><span class="sett-name">Mode sombre</span><div class="toggle ${S.theme==='dark'?'on':''}" onclick="S.theme=S.theme==='dark'?'light':'dark';sv('s_theme',S.theme);R()"></div></div><div class="sett-row"><span class="sett-name">Taille texte</span><div style="display:flex;gap:6px;align-items:center"><button class="hdr-btn" onclick="S.fontSize=Math.max(11,S.fontSize-1);sv('s_fontsize',S.fontSize);R()">A-</button><span class="sett-val">${S.fontSize}px</span><button class="hdr-btn" onclick="S.fontSize=Math.min(20,S.fontSize+1);sv('s_fontsize',S.fontSize);R()">A+</button></div></div></div>
+<div class="sett-group"><div class="sett-label">🧠 Base de données (${S.kb.length})</div>${S.kb.map((k,i)=>`<div class="kb-item"><span class="kb-text">${esc(k)}</span><button class="kb-del" onclick="S.kb.splice(${i},1);sv('s_kb',S.kb);R()">✕</button></div>`).join("")}<button class="sett-btn" onclick="S.modal={type:'addkb'};R()">+ Ajouter</button></div>
+<div class="sett-group"><div class="sett-label">🔑 API</div><div class="sett-row"><span class="sett-name">Clé</span><span class="sett-val">${S.apiKey.slice(0,8)}...</span></div><div class="sett-row"><span class="sett-name">Modèle</span><span class="sett-val">${cachedModel||'Auto'}</span></div><button class="sett-btn" onclick="const k=prompt('Nouvelle clé:');if(k&&k.length>10){S.apiKey=k;sv('s_key',k);cachedModel='';localStorage.removeItem('s_model');R()}">Changer clé</button><button class="sett-btn" onclick="testApi()">🧪 Tester</button><div id="test-result" style="font-size:11px;margin-top:6px"></div></div>
+<div class="sett-group"><button class="sett-btn danger" onclick="if(confirm('Effacer historique ?')){S.history=[];sv('s_history',[]);R()}">🗑️ Effacer historique</button></div>
+<div style="padding:16px;text-align:center;font-size:10px;color:var(--text2)">Souleyman v5.0<br>Gemini gratuit</div></div>`;
+default:return''}}
+
+function rModal(){if(S.modal?.type==="edit")return`<div class="modal-overlay" onclick="if(event.target===this){S.modal=null;R()}"><div class="modal"><div class="modal-title">✏️ Modifier</div><textarea id="medit">${S.modal.text}</textarea><div class="modal-btns"><button class="modal-btn" onclick="S.modal=null;R()">Annuler</button><button class="modal-btn primary" onclick="S.messages[S.modal.index].content=document.getElementById('medit').value;S.modal=null;R()">OK</button></div></div></div>`;
+if(S.modal?.type==="addkb")return`<div class="modal-overlay" onclick="if(event.target===this){S.modal=null;R()}"><div class="modal"><div class="modal-title">🧠 Ajouter</div><textarea id="mkb" placeholder="Info à retenir..."></textarea><div class="modal-btns"><button class="modal-btn" onclick="S.modal=null;R()">Annuler</button><button class="modal-btn primary" onclick="const t=document.getElementById('mkb').value.trim();if(t){S.kb.push(t);sv('s_kb',S.kb)}S.modal=null;R()">OK</button></div></div></div>`;return''}
+
+// SEARCH
+function renderSearchResults(){const q=S.globalSearch.toLowerCase();let r=[];
+PROPHETS.forEach(p=>{if((p.name+p.summary).toLowerCase().includes(q))r.push({type:'Prophète',title:p.name,sub:p.summary.slice(0,80)})});
+GLOSSARY.forEach(g=>{if((g.term+g.def).toLowerCase().includes(q))r.push({type:'Glossaire',title:g.term,sub:g.def.slice(0,80)})});
+COMPANIONS.forEach(c=>{if((c.name+c.bio).toLowerCase().includes(q))r.push({type:'Compagnon',title:c.name,sub:c.bio.slice(0,80)})});
+SCHOLARS.forEach(s=>{if((s.name+s.works).toLowerCase().includes(q))r.push({type:'Savant',title:s.name,sub:s.specialty})});
+NAMES99.forEach(n=>{if((n.nom+n.fr).toLowerCase().includes(q))r.push({type:'Nom d\'Allah',title:n.nom+' — '+n.fr,sub:n.ar})});
+DUAS.forEach(d=>d.items.forEach(i=>{if((i.title+i.fr).toLowerCase().includes(q))r.push({type:'Du\'a',title:i.title,sub:i.fr.slice(0,80)})}));
+NAWAQID.forEach(n=>{if((n.name+n.desc).toLowerCase().includes(q))r.push({type:'Annulatif',title:n.name,sub:n.desc.slice(0,80)})});
+MAJOR_SINS.forEach(s=>{if((s.name+s.desc).toLowerCase().includes(q))r.push({type:'Péché',title:s.name,sub:s.desc.slice(0,80)})});
+return r.length===0?'<div style="padding:20px;text-align:center;color:var(--text2)">Aucun résultat</div>':r.map(x=>`<div class="li"><div style="font-size:9px;color:var(--gold-dim);text-transform:uppercase;letter-spacing:1px">${x.type}</div><div class="li-t">${x.title}</div><div class="li-s">${x.sub}...</div></div>`).join("")}
+
+// ===== ACTIONS =====
+window.go=function(t){S.tab=t;S.sub=null;R()};
+window.openSub=function(s,d){S.sub=s;S.subData=d??null;R()};
+window.goBack=function(){if(S.sub==='prophet-d')S.sub='prophets';else if(S.sub==='dua-cat')S.sub='duas';else if(S.sub==='quiz')S.sub='quiz-select';else S.sub=null;S.subData=null;R()};
+window.saveKey=function(){const k=document.getElementById("skey").value.trim();if(!k||k.length<10){const e=document.getElementById("serr");e.textContent="Clé invalide";e.style.display="block";return}S.apiKey=k;sv("s_key",k);R()};
+window.newChat=function(){if(S.messages.length>1)saveHist();S.messages=[];R()};
+window.quickChat=function(q){S.tab="chat";S.sub=null;S.messages=[];S.messages.push({role:"user",content:q});S.loading=true;R();callGemini()};
+window.sendMsg=function(){const ta=document.getElementById("ci"),t=ta?.value?.trim();if(!t||S.loading)return;const kb=t.match(/rentre?\s*(dans)?\s*(ta|la)?\s*base\s*de?\s*donn[ée]e?s?\s*:?\s*(.+)/i);if(kb){S.kb.push(kb[3].trim());sv("s_kb",S.kb);S.messages.push({role:"user",content:t},{role:"model",content:`✅ Enregistré : **"${kb[3].trim()}"**\nGère ta base dans Réglages.`});R();return}S.messages.push({role:"user",content:t});S.loading=true;S.stats.total++;sv("s_stats",S.stats);R();callGemini()};
+window.favMsg=function(i){const m=S.messages[i],q=S.messages[i-1]?.content||"",x=S.favorites.findIndex(f=>f.a===m.content);if(x>=0)S.favorites.splice(x,1);else S.favorites.push({q,a:m.content,date:new Date().toLocaleDateString('fr-FR')});sv("s_favs",S.favorites);R()};
+window.editMsg=function(i){S.modal={type:"edit",index:i,text:S.messages[i].content};R()};
+window.startQuiz=function(t,l){S.quizTheme=t;S.quizLevel=l;S.quizIdx=0;S.quizScore=0;S.quizAnswered=false;S.quizSelected=-1;S.sub='quiz';R()};
+window.ansQuiz=function(i){if(S.quizAnswered)return;S.quizAnswered=true;S.quizSelected=i;const q=QUIZ_DATA[S.quizTheme]?.[S.quizLevel]?.[S.quizIdx];if(q&&i===q.c)S.quizScore++;R()};
+window.nextQuiz=function(){S.quizIdx++;S.quizAnswered=false;S.quizSelected=-1;R()};
+window.compareScholars=function(){const t=prompt("Sujet à comparer entre savants ?");if(t)quickChat(`Compare les avis des savants salafistes (Ibn Taymiyya, Ibn Bâz, Al-Albani, Ibn Outhaymin, Al-Fawzan) sur : "${t}".`)};
+window.genKhutba=function(t){quickChat(`Prépare un rappel islamique complet sur : "${t}". Structure : 1. Bismillah 2. Versets + tafsir 3. Hadiths authentiques 4. Paroles de savants 5. Applications 6. Du'a.`)};
+function saveHist(){if(S.messages.length<2)return;const f=S.messages.find(m=>m.role==="user");S.history.unshift({date:new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}),preview:f?.content||"...",messages:[...S.messages]});if(S.history.length>50)S.history.pop();sv("s_history",S.history)}
+
+// ===== API =====
+const MODELS=["gemini-2.5-flash","gemini-2.0-flash","gemini-1.5-flash"];
+let cachedModel=localStorage.getItem("s_model")||"";
+async function detectModel(){if(cachedModel)return cachedModel;for(let i=0;i<MODELS.length;i++){try{const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODELS[i]}:generateContent?key=${S.apiKey}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({contents:[{role:"user",parts:[{text:"1"}]}],generationConfig:{maxOutputTokens:5}})});const d=await r.json();if(d.candidates){cachedModel=MODELS[i];localStorage.setItem("s_model",cachedModel);return cachedModel}if(d.error?.code===404)continue;cachedModel=MODELS[i];localStorage.setItem("s_model",cachedModel);return cachedModel}catch(e){}}cachedModel=MODELS[0];return cachedModel}
+async function callGemini(){try{if(!cachedModel)await detectModel();const kb=S.kb.length?S.kb.join("\n- "):"Aucune.",pr=`${S.profile.name||'?'}, ${S.profile.level}`,sys=SYSTEM_PROMPT.replace("{KB}",kb).replace("{PROF}",pr),cat=S.category!=="Général"?`\nCatégorie: ${S.category}.`:"";
+const msgs=S.messages.filter(m=>m.role==="user"||m.role==="model").slice(-10).map(m=>({role:m.role==="user"?"user":"model",parts:[{text:m.content}]}));
+const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${cachedModel}:generateContent?key=${S.apiKey}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({system_instruction:{parts:[{text:sys+cat}]},contents:msgs,generationConfig:{maxOutputTokens:8192,temperature:.7}})});
+const txt=await res.text();let data;try{data=JSON.parse(txt)}catch(e){S.messages.push({role:"model",content:"⚠️ Réponse invalide."});return}
+if(data.error){if(data.error.code===404){cachedModel="";localStorage.removeItem("s_model");S.messages.push({role:"model",content:"⚠️ Modèle indisponible. Réessaie."})}else if(data.error.code===429)S.messages.push({role:"model",content:"⏳ Limite temporaire. Attends 1-2 min."});else S.messages.push({role:"model",content:`⚠️ Erreur (${data.error.code}): ${data.error.message}`})}
+else{const a=data.candidates?.[0]?.content?.parts?.map(p=>p.text).join("\n");if(a){S.messages.push({role:"model",content:a});saveHist()}else S.messages.push({role:"model",content:"⚠️ Réponse vide. Reformule."})}
+}catch(e){S.messages.push({role:"model",content:`⚠️ ${e.message}`})}finally{S.loading=false;clearInterval(window._di);R()}}
+window.testApi=async function(){const el=document.getElementById("test-result");if(el)el.innerHTML='⏳...';cachedModel="";localStorage.removeItem("s_model");const m=await detectModel();if(el)el.innerHTML=m?`<span style="color:#2ecc71">✅ ${m}</span>`:'<span style="color:#e74c3c">❌ Erreur</span>'};
+
+// INIT
+R();
+if(S.apiKey&&!cachedModel)detectModel();
+
+</script>
+</body>
+</html>
